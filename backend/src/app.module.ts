@@ -4,7 +4,6 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 import { configuration, envValidationSchema } from './config';
 import { PrismaModule } from './prisma';
-import { HealthModule } from './health';
 import { AuthModule } from './auth';
 import { StorageModule } from './storage';
 import { UsersModule } from './users';
@@ -19,6 +18,7 @@ import { ReportsModule } from './reports';
 import { SearchModule } from './search';
 import { JobsModule } from './jobs';
 import { ActivityModule } from './activity';
+import { ProductionModule } from './production';
 import { RequestIdMiddleware } from './common/middlewares';
 import { REQUEST_ID_HEADER } from './common/constants';
 
@@ -77,7 +77,6 @@ import { REQUEST_ID_HEADER } from './common/constants';
       },
     ]),
     PrismaModule,
-    HealthModule,
     AuthModule,
     StorageModule,
     UsersModule,
@@ -92,6 +91,7 @@ import { REQUEST_ID_HEADER } from './common/constants';
     SearchModule,
     JobsModule,
     ActivityModule,
+    ProductionModule,
   ],
 })
 export class AppModule implements NestModule {
