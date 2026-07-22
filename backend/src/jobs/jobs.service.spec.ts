@@ -38,7 +38,47 @@ describe('Background Jobs & Scheduler Module (Phase 13 Unit & Integration Tests)
     };
 
     prismaMock = {
-      invoice: { findUnique: jest.fn(), update: jest.fn() },
+      invoice: {
+        findUnique: jest.fn().mockImplementation(({ where }) => {
+          if (where.id === 'inv-1') {
+            return Promise.resolve({
+              id: 'inv-1',
+              invoiceNumber: 'INV-100',
+              issuedAt: new Date(),
+              status: 'ISSUED',
+              totalAmount: 500,
+              paidAmount: 500,
+              dueAmount: 0,
+              pdfUrl: null,
+              payment: {
+                paymentNumber: 'PAY-1',
+                paymentMethod: 'UPI',
+                gatewayTransactionId: 'tx-1',
+                serviceRequest: {
+                  ticketNumber: 'SR-100',
+                  title: 'AC Repair',
+                  customer: { firstName: 'John', lastName: 'Doe', companyName: 'ACME', user: { email: 'john@example.com' } },
+                  assignedVendor: { businessName: 'Cooling Inc' },
+                },
+              },
+            });
+          }
+          if (where.id === 'inv-already-pdf') {
+            return Promise.resolve({
+              id: 'inv-already-pdf',
+              invoiceNumber: 'INV-100',
+              issuedAt: new Date(),
+              status: 'ISSUED',
+              totalAmount: 500,
+              paidAmount: 500,
+              dueAmount: 0,
+              pdfUrl: 'http://localhost:3000/existing.html',
+            });
+          }
+          return Promise.resolve(null);
+        }),
+        update: jest.fn().mockResolvedValue({ id: 'inv-1', pdfUrl: 'http://localhost:3000/uploads/invoices/INV-1.html' }),
+      },
       payment: { findUnique: jest.fn() },
       notification: { deleteMany: jest.fn().mockResolvedValue({ count: 12 }) },
     };
@@ -93,12 +133,6 @@ describe('Background Jobs & Scheduler Module (Phase 13 Unit & Integration Tests)
 
   describe('Processors (Notification, Invoice PDF, Payment, Cleanup)', () => {
     it('InvoiceProcessor should skip PDF rendering if pdfUrl already exists (Idempotency)', async () => {
-      prismaMock.invoice.findUnique.mockResolvedValue({
-        id: 'inv-already-pdf',
-        invoiceNumber: 'INV-100',
-        pdfUrl: 'http://localhost:3000/existing.html',
-      });
-
       const res = await invoiceProcessor.processInvoicePdf({ invoiceId: 'inv-already-pdf' });
 
       expect(res.isIdempotent).toBe(true);
