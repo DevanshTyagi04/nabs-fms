@@ -6,6 +6,8 @@ import { configuration, envValidationSchema } from './config';
 import { PrismaModule } from './prisma';
 import { HealthModule } from './health';
 import { AuthModule } from './auth';
+import { StorageModule } from './storage';
+import { UsersModule } from './users';
 import { RequestIdMiddleware } from './common/middlewares';
 import { REQUEST_ID_HEADER } from './common/constants';
 
@@ -66,6 +68,8 @@ import { REQUEST_ID_HEADER } from './common/constants';
     PrismaModule,
     HealthModule,
     AuthModule,
+    StorageModule,
+    UsersModule,
   ],
 })
 export class AppModule implements NestModule {
