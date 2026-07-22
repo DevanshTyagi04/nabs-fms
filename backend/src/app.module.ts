@@ -5,6 +5,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { configuration, envValidationSchema } from './config';
 import { PrismaModule } from './prisma';
 import { HealthModule } from './health';
+import { AuthModule } from './auth';
 import { RequestIdMiddleware } from './common/middlewares';
 import { REQUEST_ID_HEADER } from './common/constants';
 
@@ -64,6 +65,7 @@ import { REQUEST_ID_HEADER } from './common/constants';
     ]),
     PrismaModule,
     HealthModule,
+    AuthModule,
   ],
 })
 export class AppModule implements NestModule {

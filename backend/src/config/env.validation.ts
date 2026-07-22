@@ -14,6 +14,8 @@ export const envValidationSchema = Joi.object({
   JWT_REFRESH_SECRET: Joi.string().required().messages({
     'any.required': 'JWT_REFRESH_SECRET environment variable is required',
   }),
+  JWT_ACCESS_EXPIRATION: Joi.string().default('15m'),
+  JWT_REFRESH_EXPIRATION: Joi.string().default('7d'),
   REDIS_URL: Joi.string().required().messages({
     'any.required': 'REDIS_URL environment variable is required',
   }),

@@ -250,20 +250,26 @@ model User {
 }
 
 model RefreshToken {
-  id         String    @id @default(uuid()) @db.Uuid
-  userId     String    @db.Uuid
-  tokenHash  String    @unique
-  deviceName String?
-  ipAddress  String?
-  expiresAt  DateTime
-  revokedAt  DateTime?
-  createdAt  DateTime  @default(now())
+  id                String    @id @default(uuid()) @db.Uuid
+  userId            String    @db.Uuid
+  tokenHash         String    @unique
+  deviceName        String?
+  ipAddress         String?
+  userAgent         String?
+  platform          String?
+  browser           String?
+  expiresAt         DateTime
+  revokedAt         DateTime?
+  revokedReason     String?
+  replacedByTokenId String?   @db.Uuid
+  createdAt         DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([tokenHash])
   @@index([expiresAt])
+  @@index([revokedAt])
   @@map("refresh_tokens")
 }
 

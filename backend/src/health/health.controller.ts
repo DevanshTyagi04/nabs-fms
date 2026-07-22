@@ -2,7 +2,7 @@ import { Controller, Get, HttpStatus, HttpException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
-import { BypassTransform } from '../common/decorators';
+import { Public } from '../auth/decorators';
 
 @ApiTags('Health Check')
 @Controller('health')
@@ -12,6 +12,7 @@ export class HealthController {
     private readonly configService: ConfigService,
   ) {}
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Comprehensive health check status' })
   @ApiResponse({ status: 200, description: 'Application and database status overview' })
@@ -45,6 +46,7 @@ export class HealthController {
     };
   }
 
+  @Public()
   @Get('live')
   @ApiOperation({ summary: 'Liveness probe check' })
   @ApiResponse({ status: 200, description: 'Service is alive' })
@@ -55,6 +57,7 @@ export class HealthController {
     };
   }
 
+  @Public()
   @Get('ready')
   @ApiOperation({ summary: 'Readiness probe check (Database connectivity)' })
   @ApiResponse({ status: 200, description: 'Service is ready to handle traffic' })
