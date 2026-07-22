@@ -10,6 +10,7 @@ import { StorageModule } from './storage';
 import { UsersModule } from './users';
 import { ServiceRequestsModule } from './service-requests';
 import { SurveysModule } from './surveys';
+import { EstimatesModule } from './estimates';
 import { RequestIdMiddleware } from './common/middlewares';
 import { REQUEST_ID_HEADER } from './common/constants';
 
@@ -74,6 +75,7 @@ import { REQUEST_ID_HEADER } from './common/constants';
     UsersModule,
     ServiceRequestsModule,
     SurveysModule,
+    EstimatesModule,
   ],
 })
 export class AppModule implements NestModule {
