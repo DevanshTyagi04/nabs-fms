@@ -15,6 +15,7 @@ import { WorkOrdersModule } from './work-orders';
 import { PaymentsModule } from './payments';
 import { InvoicesModule } from './invoices';
 import { NotificationsModule } from './notifications';
+import { ReportsModule } from './reports';
 import { RequestIdMiddleware } from './common/middlewares';
 import { REQUEST_ID_HEADER } from './common/constants';
 
@@ -84,6 +85,7 @@ import { REQUEST_ID_HEADER } from './common/constants';
     PaymentsModule,
     InvoicesModule,
     NotificationsModule,
+    ReportsModule,
   ],
 })
 export class AppModule implements NestModule {
