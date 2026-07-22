@@ -8,6 +8,7 @@ import { HealthModule } from './health';
 import { AuthModule } from './auth';
 import { StorageModule } from './storage';
 import { UsersModule } from './users';
+import { ServiceRequestsModule } from './service-requests';
 import { RequestIdMiddleware } from './common/middlewares';
 import { REQUEST_ID_HEADER } from './common/constants';
 
@@ -70,6 +71,7 @@ import { REQUEST_ID_HEADER } from './common/constants';
     AuthModule,
     StorageModule,
     UsersModule,
+    ServiceRequestsModule,
   ],
 })
 export class AppModule implements NestModule {
