@@ -1,7 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -10,6 +10,7 @@ import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters';
 import { ResponseInterceptor } from './common/interceptors';
 import { API_PREFIX } from './common/constants';
+import { createOpenApiConfig, DocsController } from './docs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -54,27 +55,18 @@ async function bootstrap() {
   // 7. Enable Graceful Shutdown Hooks
   app.enableShutdownHooks();
 
-  // 8. Swagger OpenAPI Setup
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('NABS Field Service Management API')
-    .setDescription(
-      'Enterprise FSM Platform Backend API Infrastructure. Modular API built with NestJS, Prisma 7, and PostgreSQL.',
-    )
-    .setVersion('1.0.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'Authorization',
-        description: 'Enter JWT access token',
-        in: 'header',
-      },
-      'JWT-auth',
-    )
-    .build();
-
+  // 8. Swagger OpenAPI Setup & Controller Injection
+  const swaggerConfig = createOpenApiConfig();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
+
+  // Inject generated OpenAPI document into DocsController (Single Source of Truth)
+  try {
+    const docsController = app.get(DocsController);
+    docsController.setOpenApiDocument(document);
+  } catch {
+    // Graceful fallback during isolated unit testing
+  }
+
   SwaggerModule.setup('api/docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true,

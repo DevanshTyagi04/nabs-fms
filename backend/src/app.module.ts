@@ -19,6 +19,7 @@ import { SearchModule } from './search';
 import { JobsModule } from './jobs';
 import { ActivityModule } from './activity';
 import { ProductionModule } from './production';
+import { DocsModule } from './docs';
 import { RequestIdMiddleware } from './common/middlewares';
 import { REQUEST_ID_HEADER } from './common/constants';
 
@@ -92,6 +93,7 @@ import { REQUEST_ID_HEADER } from './common/constants';
     JobsModule,
     ActivityModule,
     ProductionModule,
+    DocsModule,
   ],
 })
 export class AppModule implements NestModule {
