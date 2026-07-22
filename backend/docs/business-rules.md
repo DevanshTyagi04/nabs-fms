@@ -1,4 +1,4 @@
-# Business Rules (Revision 2)
+# Business Rules (Production Final Schema)
 
 This document outlines the core business and operational rules governing the **NABS Field Service Management (FSM) Platform**.
 
@@ -6,41 +6,47 @@ This document outlines the core business and operational rules governing the **N
 
 ## 1. Authentication & Security
 - **Single Identity**: Every actor (Customer, Vendor, Admin) has a single `User` record containing authentication credentials and status flags.
-- **Hashed Refresh Tokens**: Refresh tokens must be stored as SHA-256 hashes (`tokenHash`) in `RefreshToken` with client IP and device name metadata. Plain-text token storage is prohibited.
+- **Hashed Refresh Tokens**: Refresh tokens must be stored as SHA-256 hashes (`tokenHash`) in `RefreshToken` with client IP and device metadata.
+- **Timestamp Verification**: `emailVerifiedAt` and `phoneVerifiedAt` record exact OTP verification timestamps.
 
 ---
 
 ## 2. Vendor Verification & Skills
 - **Verification Prerequisite**: A vendor **must** have `verificationStatus = VERIFIED` before assignment to a `ServiceRequest` or `WorkOrder`.
-- **Skill Alignment**: Vendors can only be assigned to service requests matching their active `VendorSkill` categories.
+- **Skill Level Assignment**: `VendorSkill` stores `skillLevel` (`BEGINNER`, `INTERMEDIATE`, `EXPERT`) alongside `yearsOfExperience` to ensure complex jobs are assigned to qualified experts.
 - **Tax & Legal Information**: Verified vendors must provide valid `gstNumber` and `panNumber` details for financial invoicing compliance.
 
 ---
 
 ## 3. Service Request & Workflow History
 - **Central Parent Entity**: All surveys, estimates, work orders, payments, and invoices belong to a parent `ServiceRequest`.
-- **Business History Logging**: Every status transition of a `ServiceRequest` must create a `ServiceRequestHistory` record capturing `fromStatus`, `toStatus`, `changedById`, `remarks`, and `createdAt` for SLA tracking.
+- **Business History Logging**: Every status transition of a `ServiceRequest` creates a `ServiceRequestHistory` record for SLA tracking.
 
 ---
 
-## 4. Survey Rules
-- **Workflow Timestamps**: Surveys record `startedAt` (when site assessment starts), `submittedAt` (when vendor submits report), and `approvedAt` (when customer/admin accepts).
-- **Survey Versioning**: Re-evaluations create a new version (`version = version + 1`) marking previous versions as `SUPERSEDED`.
+## 4. Survey & Inspection Rules
+- **Severity Classification**: Survey line items (`SurveyItem`) must record `severity` (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`), `sortOrder`, `isMandatory`, and `photoRequired`.
+- **Workflow Timestamps**: Surveys record `startedAt`, `submittedAt`, and `approvedAt`.
 
 ---
 
 ## 5. Estimate Lifecycle & Expiration
-- **Validity Constraints**: `Estimate` contains `validUntil`, `approvedAt`, and `rejectedAt`. An expired estimate (`validUntil < current_timestamp`) cannot be approved by a customer.
+- **Validity Constraints**: `Estimate` contains `validUntil`, `approvedAt`, and `rejectedAt`. Expired estimates cannot be approved.
 - **Immutable Proposals**: Modifications create a new estimate version, transitioning the previous estimate to `REVISED`.
 
 ---
 
 ## 6. Work Order & Task Scheduling
-- **Task Sequencing**: Tasks inside a `WorkOrder` (`WorkTask`) are assigned an explicit `sequenceNumber`, `estimatedHours`, and `actualHours` for labor efficiency analysis.
-- **Execution Tracking**: `WorkOrder` records `scheduledDate`, `estimatedDuration`, `actualStartTime`, and `actualEndTime` to calculate dispatch delay metrics.
+- **Time Bounds**: `WorkOrder` scheduling is governed by `scheduledStart` and `scheduledEnd` timestamps.
+- **Task Remarks**: `WorkTask` records `sequenceNumber`, `estimatedHours`, `actualHours`, and `remarks`.
 
 ---
 
-## 7. Comments & Attachments
-- **Contextual Collaboration**: `Comment` allows Admins, Vendors, and Customers to record notes on specific entities (`entityType`, `entityId`).
-- **File Asset Integrity**: `Attachment` validates `fileName`, `mimeType`, `fileSize`, `storageProvider`, and `checksum` to prevent duplicate file uploads.
+## 7. Financial & Invoicing Rules
+- **Gateway & Method Enums**: `Payment` enforces `PaymentGateway` and `PaymentMethod` enums.
+- **Invoice Coupling**: Every `Invoice` is bound 1:1 to a `Payment` transaction with `InvoiceStatus` (`DRAFT`, `ISSUED`, `PAID`, `CANCELLED`).
+
+---
+
+## 8. Explicit Attachment & Comment Integrity
+- **Database Enforcement**: File attachments and comments reference parent entities through explicit foreign keys (`serviceRequestId`, `workOrderId`, etc.) with PostgreSQL native `onDelete: Cascade` rules.

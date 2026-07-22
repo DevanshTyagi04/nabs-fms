@@ -1,33 +1,66 @@
-# Architecture Notes (Final Frozen State)
+# Architecture Notes (Production Final Hardened Schema)
 
-This document outlines the frozen architectural choices for the **NABS Field Service Management (FSM) Platform**.
-
----
-
-## 1. Direct Invoice to Payment Coupling
-- `Invoice` is directly linked via a 1:1 foreign key (`paymentId`) to `Payment`.
-- **Financial Compliance**: Every tax invoice generated in NABS corresponds to a specific, recorded financial transaction (`Payment`). Since `Payment` is tied to `ServiceRequest`, `Invoice` maintains access to request data through `Payment` without redundant or unnormalized foreign key duplication.
+This document outlines the final production-hardened architectural choices for the **NABS Field Service Management (FSM) Platform**.
 
 ---
 
-## 2. Granular Verification Timestamps
-- `User.isVerified` (Boolean) was replaced with `emailVerifiedAt` (`DateTime?`) and `phoneVerifiedAt` (`DateTime?`).
-- **Auditability**: Enables distinct tracking for email and SMS OTP verification workflows, compliance logging, and security re-verification policies.
+## 1. Explicit Foreign Keys & PostgreSQL XOR CHECK Constraints (Attachment & Comment)
+While explicit optional foreign keys (`serviceRequestId`, `surveyId`, etc.) provide database-enforced referential integrity and native PostgreSQL cascade deletes, a record must belong to **exactly one** parent entity at a time.
+
+Since Prisma ORM DSL syntax does not natively generate multi-column XOR `CHECK` constraints, we enforce this at the PostgreSQL engine level via custom SQL migrations (`migrations/YYYYMMDDHHMMSS_add_xor_check_constraints/migration.sql`):
+
+```sql
+-- Enforce exactly ONE parent reference per comment
+ALTER TABLE "comments" ADD CONSTRAINT "chk_comment_single_parent" CHECK (
+  (CASE WHEN "serviceRequestId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "surveyId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "surveyItemId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "estimateId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "workOrderId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "workTaskId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "paymentId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "invoiceId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "vendorProfileId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "customerProfileId" IS NOT NULL THEN 1 ELSE 0 END) = 1
+);
+
+-- Enforce exactly ONE parent reference per attachment
+ALTER TABLE "attachments" ADD CONSTRAINT "chk_attachment_single_parent" CHECK (
+  (CASE WHEN "serviceRequestId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "surveyId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "surveyItemId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "estimateId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "workOrderId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "workTaskId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "paymentId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "invoiceId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "userAvatarId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "vendorProfileId" IS NOT NULL THEN 1 ELSE 0 END +
+   CASE WHEN "customerProfileId" IS NOT NULL THEN 1 ELSE 0 END) = 1
+);
+```
 
 ---
 
-## 3. Dynamic Survey Templates (`SurveyItem`)
-- `SurveyItem` includes `sortOrder`, `isMandatory`, and `photoRequired`.
-- **Mobile Experience**: Vendor mobile apps can render dynamic inspection checklists with mandatory checks, enforced before/after photo uploads (`photoRequired`), and custom checklist sorting (`sortOrder`).
+## 2. Optimistic Concurrency Control (`version`)
+High-volume field service management platforms experience concurrent updates (e.g. simultaneous vendor assignments, automated payment webhook processing, and field technician status updates).
+
+We implement optimistic concurrency control (`version Int @default(1)`) on core transactional entities:
+- `ServiceRequest`
+- `WorkOrder`
+- `Payment`
+
+**How it protects data**: NestJS services include `where: { id, version }` when applying state updates, incrementing `version: version + 1`. If another actor modified the record concurrently, the update fails cleanly with a concurrency error rather than overwriting data silently.
 
 ---
 
-## 4. WorkOrder Scheduling Bounds
-- `WorkOrder` includes `scheduledStart` and `scheduledEnd` alongside `scheduledDate` and `estimatedDuration`.
-- **Calendar & Dispatch Integration**: Enables exact calendar slot booking (e.g. 10:00 AM - 12:00 PM) for vendor dispatch boards and mobile app calendar synchronization.
+## 3. Explicit Soft-Delete Strategy
+- **Master & Configuration Data (`deletedAt` Enabled)**: `User`, `CustomerProfile`, `VendorProfile`, `AdminProfile`, `Address`, `ServiceCategory`.
+  - *Reason*: Deactivating a vendor or service category must mark `deletedAt` without hard-deleting records, preserving historical references in past work orders and financial invoices.
+- **Transactional & Workflow Data (`deletedAt` Disabled)**: `ServiceRequest`, `Survey`, `Estimate`, `WorkOrder`, `Payment`, `Invoice`, `AuditLog`, `ServiceRequestHistory`.
+  - *Reason*: Financial transactions and service request contracts must never be soft-deleted. Status transitions use domain enums (`CANCELLED`, `ARCHIVED`, `SUPERSEDED`, `REFUNDED`), fulfilling legal non-repudiation and financial auditing standards.
 
 ---
 
-## 5. Expanded Financial Gateway Attributes
-- `Payment` captures `gateway`, `gatewayTransactionId`, `gatewayOrderId`, and `paymentMethod`.
-- **Reconciliation**: Provides seamless webhook processing and financial reconciliation with payment processors like Stripe, Razorpay, or PayPal.
+## 4. `StorageProvider` Enum
+`Attachment.storageProvider` uses `StorageProvider` enum (`S3`, `GCS`, `AZURE_BLOB`, `LOCAL`) instead of plain-text strings to ensure compile-time type safety across cloud storage integrations.

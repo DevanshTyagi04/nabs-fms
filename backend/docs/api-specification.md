@@ -1,4 +1,4 @@
-# API Specification (Revision 2)
+# API Specification (Production Final Schema)
 
 This document details the RESTful API endpoints planned for the **NABS Field Service Management (FSM) Platform** backend.
 
@@ -10,21 +10,6 @@ This document details the RESTful API endpoints planned for the **NABS Field Ser
 - **Method**: `POST`
 - **Route**: `/api/v1/auth/login`
 - **Purpose**: Authenticate user credentials and return JWT access token and hashed refresh token session.
-- **Authentication**: None
-- **Response Body**:
-  ```json
-  {
-    "accessToken": "eyJhbGciOi...",
-    "refreshToken": "7f8b9a1c...",
-    "user": { "id": "u-123", "email": "vendor@nabs.com", "role": "VENDOR" }
-  }
-  ```
-
-### 1.2 Refresh Token
-- **Method**: `POST`
-- **Route**: `/api/v1/auth/refresh`
-- **Purpose**: Exchange a valid refresh token for a new access token.
-- **Status Codes**: `200 OK`, `401 Unauthorized`
 
 ---
 
@@ -34,22 +19,19 @@ This document details the RESTful API endpoints planned for the **NABS Field Ser
 - **Method**: `GET`
 - **Route**: `/api/v1/service-requests/:id/history`
 - **Purpose**: Fetch status transition history (`ServiceRequestHistory`) for SLA tracking.
-- **Roles Allowed**: `ADMIN`, `CUSTOMER`, `VENDOR`
-- **Status Codes**: `200 OK`
 
 ---
 
 ## 3. Comment Module (`/api/v1/comments`)
 
-### 3.1 Create Comment
+### 3.1 Create Comment (Explicit Relations)
 - **Method**: `POST`
 - **Route**: `/api/v1/comments`
-- **Purpose**: Post a contextual business note on an entity (`SERVICE_REQUEST`, `SURVEY`, `WORK_ORDER`, etc.).
+- **Purpose**: Post a contextual note on a specific entity using explicit relation fields (`serviceRequestId`, `workOrderId`, etc.).
 - **Request Body**:
   ```json
   {
-    "entityType": "SERVICE_REQUEST",
-    "entityId": "sr-uuid-1234",
+    "serviceRequestId": "sr-uuid-1234",
     "comment": "Customer requested work after 2 PM."
   }
   ```
@@ -62,5 +44,5 @@ This document details the RESTful API endpoints planned for the **NABS Field Ser
 ### 4.1 Upload File Metadata
 - **Method**: `POST`
 - **Route**: `/api/v1/attachments`
-- **Purpose**: Record file attachment metadata with storage provider and checksum.
+- **Purpose**: Record file attachment metadata with explicit entity relation, storage provider, and SHA-256 checksum.
 - **Status Codes**: `201 Created`

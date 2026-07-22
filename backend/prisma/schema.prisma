@@ -1,8 +1,9 @@
 // ==============================================================================
-// NABS Field Service Management (FSM) Platform - Production Prisma Schema
+// NABS Field Service Management (FSM) Platform - Production Hardened Prisma Schema
 // Database: Neon PostgreSQL
 // ORM: Prisma
 // Primary Keys: UUID v4 for all entities
+// Strict Referential Integrity & Optimistic Concurrency Control
 // ==============================================================================
 
 generator client {
@@ -11,7 +12,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ==============================================================================
@@ -42,6 +42,12 @@ enum VendorAvailabilityStatus {
   BUSY
   ON_LEAVE
   OFFLINE
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  EXPERT
 }
 
 enum AddressType {
@@ -98,6 +104,13 @@ enum SurveyStatus {
   SUPERSEDED
 }
 
+enum SurveySeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
 enum EstimateStatus {
   DRAFT
   PENDING_APPROVAL
@@ -139,18 +152,35 @@ enum PaymentStatus {
   REFUNDED
 }
 
-enum EntityType {
-  SERVICE_REQUEST
-  SURVEY
-  SURVEY_ITEM
-  ESTIMATE
-  WORK_ORDER
-  WORK_TASK
-  PAYMENT
-  INVOICE
-  USER
-  VENDOR_PROFILE
-  CUSTOMER_PROFILE
+enum PaymentGateway {
+  RAZORPAY
+  STRIPE
+  CASH
+  BANK_TRANSFER
+  MANUAL
+}
+
+enum PaymentMethod {
+  UPI
+  CARD
+  NET_BANKING
+  BANK_TRANSFER
+  CASH
+  WALLET
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  CANCELLED
+}
+
+enum StorageProvider {
+  S3
+  GCS
+  AZURE_BLOB
+  LOCAL
 }
 
 enum NotificationType {
@@ -201,15 +231,16 @@ model User {
   vendorProfile   VendorProfile?
   adminProfile    AdminProfile?
 
-  // Infrastructure Relations
+  // Infrastructure & Log Relations
   refreshTokens          RefreshToken[]
-  comments               Comment[]
+  comments               Comment[]               @relation("UserComments")
   notifications          Notification[]          @relation("RecipientNotifications")
   performedAuditLogs     AuditLog[]              @relation("PerformedByAuditLogs")
   statusChanges          ServiceRequestHistory[] @relation("ChangedByStatusHistory")
   workStatusChanges      WorkStatusHistory[]     @relation("WorkStatusChangedBy")
   workTimelineEvents     WorkTimeline[]          @relation("WorkTimelineActor")
   uploadedAttachments    Attachment[]            @relation("UploadedByAttachments")
+  avatarAttachments      Attachment[]            @relation("UserAvatarAttachments")
 
   @@index([email])
   @@index([phone])
@@ -250,6 +281,8 @@ model CustomerProfile {
   addresses       Address[]
   amcSubscriptions AMCSubscription[]
   serviceRequests ServiceRequest[]
+  comments        Comment[]
+  attachments     Attachment[]
 
   @@index([userId])
   @@map("customer_profiles")
@@ -279,6 +312,8 @@ model VendorProfile {
   serviceRequests ServiceRequest[] @relation("AssignedVendorRequests")
   surveys         Survey[]
   workOrders      WorkOrder[]
+  comments        Comment[]
+  attachments     Attachment[]
 
   @@index([userId])
   @@index([verificationStatus])
@@ -383,13 +418,14 @@ model ServiceCategory {
 }
 
 model VendorSkill {
-  id                String   @id @default(uuid()) @db.Uuid
-  vendorId          String   @db.Uuid
-  categoryId        String   @db.Uuid
-  yearsOfExperience Int      @default(0)
-  isPrimary         Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                String     @id @default(uuid()) @db.Uuid
+  vendorId          String     @db.Uuid
+  categoryId        String     @db.Uuid
+  yearsOfExperience Int        @default(0)
+  skillLevel        SkillLevel @default(INTERMEDIATE)
+  isPrimary         Boolean    @default(false)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
 
   vendor   VendorProfile   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   category ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
@@ -397,6 +433,7 @@ model VendorSkill {
   @@unique([vendorId, categoryId])
   @@index([vendorId])
   @@index([categoryId])
+  @@index([skillLevel])
   @@map("vendor_skills")
 }
 
@@ -418,6 +455,7 @@ model ServiceRequest {
   priority          Priority      @default(MEDIUM)
   status            RequestStatus @default(CREATED)
   preferredDate     DateTime?
+  version           Int           @default(1)
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
@@ -432,6 +470,8 @@ model ServiceRequest {
   estimates       Estimate[]
   workOrders      WorkOrder[]
   payments        Payment[]
+  comments        Comment[]
+  attachments     Attachment[]
 
   @@index([ticketNumber])
   @@index([customerId])
@@ -478,6 +518,8 @@ model Survey {
   vendor         VendorProfile  @relation(fields: [vendorId], references: [id], onDelete: Restrict)
   items          SurveyItem[]
   estimates      Estimate[]
+  comments       Comment[]
+  attachments    Attachment[]
 
   @@index([serviceRequestId])
   @@index([vendorId])
@@ -486,22 +528,26 @@ model Survey {
 }
 
 model SurveyItem {
-  id             String   @id @default(uuid()) @db.Uuid
-  surveyId       String   @db.Uuid
+  id             String         @id @default(uuid()) @db.Uuid
+  surveyId       String         @db.Uuid
   area           String
   element        String
   observation    String
   actionRequired String?
-  sortOrder      Int      @default(1)
-  isMandatory    Boolean  @default(false)
-  photoRequired  Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  severity       SurveySeverity @default(MEDIUM)
+  sortOrder      Int            @default(1)
+  isMandatory    Boolean        @default(false)
+  photoRequired  Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
-  survey Survey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  survey      Survey       @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  comments    Comment[]
+  attachments Attachment[]
 
   @@index([surveyId])
   @@index([sortOrder])
+  @@index([severity])
   @@map("survey_items")
 }
 
@@ -526,6 +572,8 @@ model Estimate {
   survey         Survey?        @relation(fields: [surveyId], references: [id], onDelete: SetNull)
   items          EstimateItem[]
   workOrders     WorkOrder[]
+  comments       Comment[]
+  attachments    Attachment[]
 
   @@index([serviceRequestId])
   @@index([status])
@@ -562,7 +610,6 @@ model WorkOrder {
   estimateId       String?         @db.Uuid
   assignedVendorId String          @db.Uuid
   status           WorkOrderStatus @default(ASSIGNED)
-  scheduledDate    DateTime
   scheduledStart   DateTime
   scheduledEnd     DateTime
   estimatedDuration Int?
@@ -570,6 +617,7 @@ model WorkOrder {
   actualEndTime    DateTime?
   startedAt        DateTime?
   completedAt      DateTime?
+  version          Int             @default(1)
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 
@@ -579,12 +627,13 @@ model WorkOrder {
   tasks          WorkTask[]
   timelineEvents WorkTimeline[]
   statusHistory  WorkStatusHistory[]
+  comments       Comment[]
+  attachments    Attachment[]
 
   @@index([workOrderNumber])
   @@index([serviceRequestId])
   @@index([assignedVendorId])
   @@index([status])
-  @@index([scheduledDate])
   @@index([scheduledStart])
   @@map("work_orders")
 }
@@ -593,6 +642,7 @@ model WorkTask {
   id             String     @id @default(uuid()) @db.Uuid
   workOrderId    String     @db.Uuid
   description    String
+  remarks        String?
   sequenceNumber Int        @default(1)
   estimatedHours Decimal?   @db.Decimal(5, 2)
   actualHours    Decimal?   @db.Decimal(5, 2)
@@ -601,7 +651,9 @@ model WorkTask {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
-  workOrder WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  workOrder   WorkOrder    @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  comments    Comment[]
+  attachments Attachment[]
 
   @@index([workOrderId])
   @@index([sequenceNumber])
@@ -648,92 +700,163 @@ model WorkStatusHistory {
 // ==============================================================================
 
 model Payment {
-  id                   String        @id @default(uuid()) @db.Uuid
-  paymentNumber        String        @unique
-  serviceRequestId     String        @db.Uuid
-  amount               Decimal       @db.Decimal(12, 2)
+  id                   String         @id @default(uuid()) @db.Uuid
+  paymentNumber        String         @unique
+  serviceRequestId     String         @db.Uuid
+  amount               Decimal        @db.Decimal(12, 2)
   type                 PaymentType
-  status               PaymentStatus @default(PENDING)
-  gateway              String?
+  status               PaymentStatus  @default(PENDING)
+  gateway              PaymentGateway @default(RAZORPAY)
   gatewayTransactionId String?
   gatewayOrderId       String?
-  paymentMethod        String?
+  paymentMethod        PaymentMethod?
   paidAt               DateTime?
-  createdAt            DateTime      @default(now())
-  updatedAt            DateTime      @updatedAt
+  version              Int            @default(1)
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
 
   serviceRequest ServiceRequest @relation(fields: [serviceRequestId], references: [id], onDelete: Restrict)
   invoice        Invoice?
+  comments       Comment[]
+  attachments    Attachment[]
 
   @@index([paymentNumber])
   @@index([serviceRequestId])
   @@index([status])
   @@index([type])
+  @@index([gateway])
   @@index([gatewayTransactionId])
   @@map("payments")
 }
 
 model Invoice {
-  id            String   @id @default(uuid()) @db.Uuid
-  invoiceNumber String   @unique
-  paymentId     String   @unique @db.Uuid
-  totalAmount   Decimal  @db.Decimal(12, 2)
-  paidAmount    Decimal  @db.Decimal(12, 2)
-  dueAmount     Decimal  @db.Decimal(12, 2)
+  id            String        @id @default(uuid()) @db.Uuid
+  invoiceNumber String        @unique
+  paymentId     String        @unique @db.Uuid
+  status        InvoiceStatus @default(ISSUED)
+  totalAmount   Decimal       @db.Decimal(12, 2)
+  paidAmount    Decimal       @db.Decimal(12, 2)
+  dueAmount     Decimal       @db.Decimal(12, 2)
   dueDate       DateTime?
-  issuedAt      DateTime @default(now())
+  issuedAt      DateTime      @default(now())
   pdfUrl        String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
-  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  payment     Payment      @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  comments    Comment[]
+  attachments Attachment[]
 
   @@index([invoiceNumber])
   @@index([paymentId])
+  @@index([status])
   @@map("invoices")
 }
 
 // ==============================================================================
-// 7. CROSS-CUTTING & INFRASTRUCTURE DOMAIN
+// 7. CROSS-CUTTING & INFRASTRUCTURE DOMAIN (EXPLICIT REFERENTIAL INTEGRITY)
 // ==============================================================================
 
 model Comment {
-  id         String     @id @default(uuid()) @db.Uuid
-  entityType EntityType
-  entityId   String     @db.Uuid
-  userId     String     @db.Uuid
-  comment    String
-  editedAt   DateTime?
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  comment   String
+  editedAt  DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Explicit Optional Foreign Keys for Full Referential Integrity & Cascade Deletes
+  serviceRequestId  String? @db.Uuid
+  surveyId          String? @db.Uuid
+  surveyItemId      String? @db.Uuid
+  estimateId        String? @db.Uuid
+  workOrderId       String? @db.Uuid
+  workTaskId        String? @db.Uuid
+  paymentId         String? @db.Uuid
+  invoiceId         String? @db.Uuid
+  vendorProfileId   String? @db.Uuid
+  customerProfileId String? @db.Uuid
 
-  @@index([entityType, entityId])
+  // Prisma Relations with Cascade Delete Rules
+  user            User             @relation("UserComments", fields: [userId], references: [id], onDelete: Cascade)
+  serviceRequest  ServiceRequest?  @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
+  survey          Survey?          @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  surveyItem      SurveyItem?      @relation(fields: [surveyItemId], references: [id], onDelete: Cascade)
+  estimate        Estimate?        @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  workOrder       WorkOrder?       @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  workTask        WorkTask?        @relation(fields: [workTaskId], references: [id], onDelete: Cascade)
+  payment         Payment?         @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  invoice         Invoice?         @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  vendorProfile   VendorProfile?   @relation(fields: [vendorProfileId], references: [id], onDelete: Cascade)
+  customerProfile CustomerProfile? @relation(fields: [customerProfileId], references: [id], onDelete: Cascade)
+
   @@index([userId])
+  @@index([serviceRequestId])
+  @@index([surveyId])
+  @@index([surveyItemId])
+  @@index([estimateId])
+  @@index([workOrderId])
+  @@index([workTaskId])
+  @@index([paymentId])
+  @@index([invoiceId])
+  @@index([vendorProfileId])
+  @@index([customerProfileId])
   @@index([createdAt])
   @@map("comments")
 }
 
 model Attachment {
-  id              String     @id @default(uuid()) @db.Uuid
-  entityType      EntityType
-  entityId        String     @db.Uuid
+  id              String          @id @default(uuid()) @db.Uuid
   fileName        String
   url             String
   mimeType        String
   fileSize        Int
-  storageProvider String     @default("S3")
+  storageProvider StorageProvider @default(S3)
   checksum        String?
-  uploadedById    String     @db.Uuid
-  uploadedAt      DateTime   @default(now())
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  uploadedById    String          @db.Uuid
+  uploadedAt      DateTime        @default(now())
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
-  uploadedBy User @relation("UploadedByAttachments", fields: [uploadedById], references: [id], onDelete: Cascade)
+  // Explicit Optional Foreign Keys for Full Referential Integrity & Cascade Deletes
+  serviceRequestId  String? @db.Uuid
+  surveyId          String? @db.Uuid
+  surveyItemId      String? @db.Uuid
+  estimateId        String? @db.Uuid
+  workOrderId       String? @db.Uuid
+  workTaskId        String? @db.Uuid
+  paymentId         String? @db.Uuid
+  invoiceId         String? @db.Uuid
+  userAvatarId      String? @db.Uuid
+  vendorProfileId   String? @db.Uuid
+  customerProfileId String? @db.Uuid
 
-  @@index([entityType, entityId])
+  // Prisma Relations with Cascade Delete Rules
+  uploadedBy      User             @relation("UploadedByAttachments", fields: [uploadedById], references: [id], onDelete: Cascade)
+  serviceRequest  ServiceRequest?  @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
+  survey          Survey?          @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  surveyItem      SurveyItem?      @relation(fields: [surveyItemId], references: [id], onDelete: Cascade)
+  estimate        Estimate?        @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  workOrder       WorkOrder?       @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  workTask        WorkTask?        @relation(fields: [workTaskId], references: [id], onDelete: Cascade)
+  payment         Payment?         @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  invoice         Invoice?         @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  userAvatar      User?            @relation("UserAvatarAttachments", fields: [userAvatarId], references: [id], onDelete: Cascade)
+  vendorProfile   VendorProfile?   @relation(fields: [vendorProfileId], references: [id], onDelete: Cascade)
+  customerProfile CustomerProfile? @relation(fields: [customerProfileId], references: [id], onDelete: Cascade)
+
   @@index([uploadedById])
+  @@index([serviceRequestId])
+  @@index([surveyId])
+  @@index([surveyItemId])
+  @@index([estimateId])
+  @@index([workOrderId])
+  @@index([workTaskId])
+  @@index([paymentId])
+  @@index([invoiceId])
+  @@index([userAvatarId])
+  @@index([vendorProfileId])
+  @@index([customerProfileId])
   @@index([checksum])
   @@map("attachments")
 }
@@ -764,8 +887,8 @@ model AuditLog {
   entityType    String
   entityId      String      @db.Uuid
   action        AuditAction
-  oldData       String?
-  newData       String?
+  oldData       Json?
+  newData       Json?
   performedById String?     @db.Uuid
   performedAt   DateTime    @default(now())
 

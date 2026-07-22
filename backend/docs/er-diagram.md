@@ -1,4 +1,4 @@
-# Entity-Relationship (ER) Diagram (Final Frozen Architecture)
+# Entity-Relationship (ER) Diagram (Production Final Schema)
 
 ```mermaid
 erDiagram
@@ -58,6 +58,17 @@ erDiagram
         datetime createdAt
         datetime updatedAt
         datetime deletedAt
+    }
+
+    VendorSkill {
+        string id PK
+        string vendorId FK
+        string categoryId FK
+        int yearsOfExperience
+        enum skillLevel
+        boolean isPrimary
+        datetime createdAt
+        datetime updatedAt
     }
 
     Address {
@@ -134,6 +145,7 @@ erDiagram
         string element
         string observation
         string actionRequired
+        enum severity
         int sortOrder
         boolean isMandatory
         boolean photoRequired
@@ -166,13 +178,26 @@ erDiagram
         string estimateId FK
         string assignedVendorId FK
         enum status
-        datetime scheduledDate
         datetime scheduledStart
         datetime scheduledEnd
         int estimatedDuration
         datetime actualStartTime
         datetime actualEndTime
         datetime startedAt
+        datetime completedAt
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    WorkTask {
+        string id PK
+        string workOrderId FK
+        string description
+        string remarks
+        int sequenceNumber
+        decimal estimatedHours
+        decimal actualHours
+        enum status
         datetime completedAt
         datetime createdAt
         datetime updatedAt
@@ -185,10 +210,10 @@ erDiagram
         decimal amount
         enum type
         enum status
-        string gateway
+        enum gateway
         string gatewayTransactionId
         string gatewayOrderId
-        string paymentMethod
+        enum paymentMethod
         datetime paidAt
         datetime createdAt
         datetime updatedAt
@@ -198,6 +223,7 @@ erDiagram
         string id PK
         string invoiceNumber UK
         string paymentId FK, UK
+        enum status
         decimal totalAmount
         decimal paidAmount
         decimal dueAmount
@@ -210,9 +236,15 @@ erDiagram
 
     Comment {
         string id PK
-        enum entityType
-        string entityId
         string userId FK
+        string serviceRequestId FK
+        string surveyId FK
+        string surveyItemId FK
+        string estimateId FK
+        string workOrderId FK
+        string workTaskId FK
+        string paymentId FK
+        string invoiceId FK
         string comment
         datetime editedAt
         datetime createdAt
@@ -221,15 +253,21 @@ erDiagram
 
     Attachment {
         string id PK
-        enum entityType
-        string entityId
+        string uploadedById FK
+        string serviceRequestId FK
+        string surveyId FK
+        string surveyItemId FK
+        string estimateId FK
+        string workOrderId FK
+        string workTaskId FK
+        string paymentId FK
+        string invoiceId FK
         string fileName
         string url
         string mimeType
         int fileSize
         string storageProvider
         string checksum
-        string uploadedById FK
         datetime uploadedAt
         datetime createdAt
         datetime updatedAt
@@ -243,6 +281,7 @@ erDiagram
     ServiceRequest ||--o{ Survey : "has_surveys"
     ServiceRequest ||--o{ Estimate : "has_estimates"
     ServiceRequest ||--o{ WorkOrder : "has_work_orders"
+    WorkOrder ||--o{ WorkTask : "contains"
     ServiceRequest ||--o{ Payment : "has_payments"
     Payment ||--o| Invoice : "generates_tax_invoice"
     Survey ||--|{ SurveyItem : "contains"
