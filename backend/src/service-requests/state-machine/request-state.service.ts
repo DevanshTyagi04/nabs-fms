@@ -7,24 +7,24 @@ import {
 import { Prisma, RequestStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma';
 
-// Map of allowed status transitions in Phase 4
+// Map of allowed status transitions across FSM lifecycle
 const ALLOWED_TRANSITIONS: Record<RequestStatus, RequestStatus[]> = {
   [RequestStatus.CREATED]: [RequestStatus.ASSIGNED, RequestStatus.CANCELLED],
-  [RequestStatus.ASSIGNED]: [RequestStatus.ASSIGNED, RequestStatus.CREATED, RequestStatus.CANCELLED],
+  [RequestStatus.ASSIGNED]: [RequestStatus.ASSIGNED, RequestStatus.CREATED, RequestStatus.SCHEDULED, RequestStatus.IN_PROGRESS, RequestStatus.CANCELLED],
   [RequestStatus.CANCELLED]: [],
-  [RequestStatus.SURVEY_PENDING]: [],
-  [RequestStatus.SURVEY_SUBMITTED]: [],
-  [RequestStatus.SURVEY_APPROVED]: [],
-  [RequestStatus.ESTIMATE_CREATED]: [],
-  [RequestStatus.AWAITING_APPROVAL]: [],
-  [RequestStatus.ADVANCE_PENDING]: [],
-  [RequestStatus.ADVANCE_RECEIVED]: [],
-  [RequestStatus.SCHEDULED]: [],
-  [RequestStatus.IN_PROGRESS]: [],
-  [RequestStatus.WORK_COMPLETED]: [],
-  [RequestStatus.QUALITY_CHECK]: [],
-  [RequestStatus.FINAL_PAYMENT_PENDING]: [],
-  [RequestStatus.COMPLETED]: [],
+  [RequestStatus.SURVEY_PENDING]: [RequestStatus.SURVEY_SUBMITTED, RequestStatus.CANCELLED],
+  [RequestStatus.SURVEY_SUBMITTED]: [RequestStatus.SURVEY_APPROVED, RequestStatus.CANCELLED],
+  [RequestStatus.SURVEY_APPROVED]: [RequestStatus.ESTIMATE_CREATED, RequestStatus.SCHEDULED, RequestStatus.IN_PROGRESS, RequestStatus.CANCELLED],
+  [RequestStatus.ESTIMATE_CREATED]: [RequestStatus.AWAITING_APPROVAL, RequestStatus.CANCELLED],
+  [RequestStatus.AWAITING_APPROVAL]: [RequestStatus.SCHEDULED, RequestStatus.IN_PROGRESS, RequestStatus.CANCELLED],
+  [RequestStatus.ADVANCE_PENDING]: [RequestStatus.ADVANCE_RECEIVED, RequestStatus.CANCELLED],
+  [RequestStatus.ADVANCE_RECEIVED]: [RequestStatus.SCHEDULED, RequestStatus.IN_PROGRESS, RequestStatus.CANCELLED],
+  [RequestStatus.SCHEDULED]: [RequestStatus.IN_PROGRESS, RequestStatus.CANCELLED],
+  [RequestStatus.IN_PROGRESS]: [RequestStatus.WORK_COMPLETED, RequestStatus.CANCELLED],
+  [RequestStatus.WORK_COMPLETED]: [RequestStatus.QUALITY_CHECK, RequestStatus.COMPLETED, RequestStatus.CANCELLED],
+  [RequestStatus.QUALITY_CHECK]: [RequestStatus.FINAL_PAYMENT_PENDING, RequestStatus.COMPLETED, RequestStatus.CANCELLED],
+  [RequestStatus.FINAL_PAYMENT_PENDING]: [RequestStatus.COMPLETED, RequestStatus.CANCELLED],
+  [RequestStatus.COMPLETED]: [RequestStatus.ARCHIVED],
   [RequestStatus.ARCHIVED]: [],
 };
 
