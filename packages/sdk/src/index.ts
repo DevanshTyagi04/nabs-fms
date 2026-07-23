@@ -187,6 +187,20 @@ export interface PaymentEntity {
   updatedAt: string;
 }
 
+export interface NotificationEntity {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: string;
+  category: string;
+  isRead: boolean;
+  entityType?: string;
+  entityId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export class NabsClient {
   private baseUrl: string;
   private token?: string;
@@ -514,5 +528,25 @@ export class NabsClient {
 
     reconcileAdmin: (id: string, dto: { status: 'SUCCESS' | 'REFUNDED'; notes?: string }) =>
       this.request<ApiResponseEnvelope<PaymentEntity>>('POST', `/api/v1/admin/payments/${id}/reconcile`, dto),
+  };
+
+  public readonly notifications = {
+    getMyNotifications: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: NotificationEntity[]; total: number }>>('GET', '/api/v1/notifications', undefined, query),
+
+    getUnreadCount: () =>
+      this.request<ApiResponseEnvelope<{ count: number }>>('GET', '/api/v1/notifications/unread-count'),
+
+    getById: (id: string) =>
+      this.request<ApiResponseEnvelope<NotificationEntity>>('GET', `/api/v1/notifications/${id}`),
+
+    markAsRead: (id: string) =>
+      this.request<ApiResponseEnvelope<NotificationEntity>>('POST', `/api/v1/notifications/${id}/read`),
+
+    markAllAsRead: () =>
+      this.request<ApiResponseEnvelope<{ count: number }>>('POST', '/api/v1/notifications/read-all'),
+
+    getAllAdmin: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: NotificationEntity[]; total: number }>>('GET', '/api/v1/admin/notifications', undefined, query),
   };
 }
