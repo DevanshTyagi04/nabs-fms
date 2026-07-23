@@ -2,7 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { Icon } from '@/components/ui/Icon';
-import { IconName } from '@packages/shared-types';
+import { UserMenu } from './UserMenu';
+import { NavigationRegistry, NavItem } from '@/navigation/registry';
+import { useAuth } from '@/auth/hooks/useAuth';
 
 export function SafeAreaWrapper({ children }: { children: React.ReactNode }) {
   const { colors } = useTheme();
@@ -32,7 +34,9 @@ export function StackHeader({
         ) : null}
         <Text style={[styles.headerTitle, { color: colors.cardForeground }]}>{title}</Text>
       </View>
-      {rightAction ? <View>{rightAction}</View> : null}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        {rightAction ? rightAction : <UserMenu />}
+      </View>
     </View>
   );
 }
@@ -40,23 +44,28 @@ export function StackHeader({
 export function BottomTabShell({
   activeTab,
   onTabChange,
-  tabs,
+  items,
 }: {
   activeTab: string;
   onTabChange: (key: string) => void;
-  tabs: Array<{ key: string; title: string; icon: IconName }>;
+  items?: NavItem[];
 }) {
   const { colors } = useTheme();
+  const { role } = useAuth();
+  const navItems = items || NavigationRegistry.getItems(role);
 
   return (
     <View style={[styles.tabBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
-      {tabs.map((tab) => {
-        const isActive = activeTab === tab.key;
+      {navItems.map((tab) => {
+        const isActive = activeTab === tab.href || (tab.href === '/' && activeTab === 'home');
+        const isDisabled = tab.disabled;
+
         return (
           <TouchableOpacity
-            key={tab.key}
-            onPress={() => onTabChange(tab.key)}
-            style={styles.tabItem}
+            key={tab.id}
+            disabled={isDisabled}
+            onPress={() => onTabChange(tab.href)}
+            style={[styles.tabItem, isDisabled && { opacity: 0.4 }]}
             accessibilityRole="tab"
             accessibilityState={{ selected: isActive }}
           >
@@ -76,31 +85,33 @@ export function BottomTabShell({
   );
 }
 
-export function MobileLayout({
-  title,
-  children,
-  activeTab,
-  onTabChange,
-  tabs,
-  rightAction,
-}: {
-  title: string;
+export interface MobileLayoutProps {
+  title?: string;
+  header?: React.ReactNode;
+  bottomBar?: React.ReactNode;
   children: React.ReactNode;
   activeTab?: string;
   onTabChange?: (key: string) => void;
-  tabs?: Array<{ key: string; title: string; icon: IconName }>;
   rightAction?: React.ReactNode;
-}) {
+}
+
+export function MobileLayout({
+  title = 'Customer Portal',
+  header,
+  bottomBar,
+  children,
+  activeTab,
+  onTabChange,
+  rightAction,
+}: MobileLayoutProps) {
   const { colors } = useTheme();
 
   return (
     <SafeAreaWrapper>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <StackHeader title={title} rightAction={rightAction} />
+        {header || <StackHeader title={title} rightAction={rightAction} />}
         <ScrollView contentContainerStyle={styles.content}>{children}</ScrollView>
-        {tabs && activeTab && onTabChange ? (
-          <BottomTabShell activeTab={activeTab} onTabChange={onTabChange} tabs={tabs} />
-        ) : null}
+        {bottomBar !== null && (bottomBar || (activeTab && onTabChange ? <BottomTabShell activeTab={activeTab} onTabChange={onTabChange} /> : null))}
       </View>
     </SafeAreaWrapper>
   );

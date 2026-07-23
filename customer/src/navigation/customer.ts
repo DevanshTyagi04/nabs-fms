@@ -1,0 +1,44 @@
+import { NavItem, NavigationRegistry } from './registry';
+
+export const CUSTOMER_NAVIGATION_CONFIG: NavItem[] = [
+  {
+    id: 'customer-home',
+    title: 'Home',
+    href: '/',
+    icon: 'grid',
+    roles: ['CUSTOMER'],
+    order: 1,
+    requiresAuth: true,
+  },
+  {
+    id: 'customer-requests',
+    title: 'Requests',
+    href: '/service-requests',
+    icon: 'briefcase',
+    roles: ['CUSTOMER'],
+    order: 2,
+    requiresAuth: true,
+    disabled: true,
+    badge: 'Phase 4',
+  },
+  {
+    id: 'customer-profile',
+    title: 'Profile',
+    href: '/profile',
+    icon: 'user',
+    roles: ['CUSTOMER'],
+    order: 3,
+    requiresAuth: true,
+  },
+  {
+    id: 'customer-settings',
+    title: 'Settings',
+    href: '/settings',
+    icon: 'settings',
+    roles: ['CUSTOMER'],
+    order: 4,
+    requiresAuth: true,
+  },
+];
+
+NavigationRegistry.registerItems(CUSTOMER_NAVIGATION_CONFIG);
