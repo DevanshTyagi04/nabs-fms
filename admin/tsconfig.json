@@ -22,7 +22,8 @@
       "@/*": ["./src/*"],
       "@packages/design-tokens": ["../packages/design-tokens/src/index.ts"],
       "@packages/shared-types": ["../packages/shared-types/src/index.ts"],
-      "@packages/constants": ["../packages/constants/src/index.ts"]
+      "@packages/constants": ["../packages/constants/src/index.ts"],
+      "@nabs/sdk": ["../packages/sdk/src/index.ts"]
     }
   },
   "include": [

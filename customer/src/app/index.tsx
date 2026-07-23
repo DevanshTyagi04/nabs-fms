@@ -19,9 +19,13 @@ import { useToast } from '@/hooks/useToast';
 import { useTheme } from '@/hooks/useTheme';
 import { CUSTOMER_TABS } from '@/constants';
 import { getStatusBadgeVariant } from '@/utils/formatters';
+import { ProtectedRoute } from '@/auth/guards/ProtectedRoute';
+import { RoleGuard } from '@/auth/guards/RoleGuard';
+import { useAuth } from '@/auth/hooks/useAuth';
 
 export default function CustomerDesignSystemShowcase() {
   const { resolvedMode, toggleTheme, colors } = useTheme();
+  const { user, role, permissions, logout } = useAuth();
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState('home');
@@ -29,166 +33,112 @@ export default function CustomerDesignSystemShowcase() {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   return (
-    <MobileLayout
-      title="Customer App Design System Showcase"
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-      tabs={CUSTOMER_TABS}
-      rightAction={
-        <TouchableOpacity onPress={toggleTheme} style={styles.themeBtn}>
-          <Icon name={resolvedMode === 'dark' ? 'sun' : 'moon'} size="md" color="primary" />
-        </TouchableOpacity>
-      }
-    >
-      {/* Banner */}
-      <View style={[styles.banner, { backgroundColor: colors.primary }]}>
-        <Badge variant="primary" dot style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
-          Phase 1 Mobile
-        </Badge>
-        <Text style={[styles.bannerTitle, { color: colors.primaryForeground }]}>Customer Mobile Design System</Text>
-        <Text style={[styles.bannerSubtitle, { color: colors.primaryForeground }]}>
-          Expo v57 Native Reusable Primitive Component Architecture
-        </Text>
-      </View>
-
-      <OfflineState />
-
-      {/* 1. Theme Tokens */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Semantic Color Tokens</CardTitle>
-          <CardDescription>Shared tokens across Customer App UI components.</CardDescription>
-        </CardHeader>
-        <CardContent style={styles.tokenGrid}>
-          {Object.entries(colors).slice(0, 10).map(([token, hex]) => (
-            <View key={token} style={[styles.tokenCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <View style={[styles.colorBox, { backgroundColor: hex as string }]} />
-              <Text style={[styles.tokenName, { color: colors.cardForeground }]}>{token}</Text>
+    <ProtectedRoute>
+      <RoleGuard roles={['CUSTOMER']}>
+        <MobileLayout
+          title="Customer Mobile Console"
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          tabs={CUSTOMER_TABS}
+          rightAction={
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <TouchableOpacity onPress={toggleTheme} style={styles.themeBtn}>
+                <Icon name={resolvedMode === 'dark' ? 'sun' : 'moon'} size="md" color="primary" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={logout} style={styles.themeBtn}>
+                <Icon name="x" size="md" color="error" />
+              </TouchableOpacity>
             </View>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* 2. Buttons */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Buttons & Sizes</CardTitle>
-        </CardHeader>
-        <CardContent style={{ gap: 10 }}>
-          <Button variant="primary" leftIcon="file-text">Book Service Request</Button>
-          <Button variant="secondary">View Request History</Button>
-          <Button variant="outline" rightIcon="chevron-right">Manage Saved Address</Button>
-          <Button variant="danger">Cancel Booking</Button>
-        </CardContent>
-      </Card>
-
-      {/* 3. Inputs */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Form Inputs</CardTitle>
-        </CardHeader>
-        <CardContent style={{ gap: 12 }}>
-          <Input label="Account Email" placeholder="customer@nabs.com" leftIcon="mail" />
-          <PasswordInput label="Customer Password" placeholder="Enter account password" />
-          <Textarea label="Service Issue Description" placeholder="Describe appliance or HVAC fault..." />
-        </CardContent>
-      </Card>
-
-      {/* 4. Badges */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Status Indicators</CardTitle>
-        </CardHeader>
-        <CardContent style={styles.rowWrap}>
-          <Badge variant={getStatusBadgeVariant('PENDING')} dot>Request: PENDING</Badge>
-          <Badge variant={getStatusBadgeVariant('SCHEDULED')} dot>Request: SCHEDULED</Badge>
-          <Badge variant={getStatusBadgeVariant('COMPLETED')} dot>Request: COMPLETED</Badge>
-        </CardContent>
-      </Card>
-
-      {/* 5. Avatars & Progress */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Customer Profile & Rating</CardTitle>
-        </CardHeader>
-        <CardContent style={{ gap: 12 }}>
-          <View style={styles.rowWrap}>
-            <Avatar name="Emily Watson" size="sm" status="online" />
-            <Avatar name="Robert Chen" size="md" status="online" />
+          }
+        >
+          {/* Banner */}
+          <View style={[styles.banner, { backgroundColor: colors.primary }]}>
+            <Badge variant="primary" dot style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
+              Phase 2 Authenticated
+            </Badge>
+            <Text style={[styles.bannerTitle, { color: colors.primaryForeground }]}>
+              Welcome, {user?.firstName || user?.email || 'Customer'}
+            </Text>
+            <Text style={[styles.bannerSubtitle, { color: colors.primaryForeground }]}>
+              Logged in as {user?.email} (Role: {role}, Permissions: {permissions.join(', ')})
+            </Text>
           </View>
-          <ProgressBar value={85} showLabel color="primary" />
-        </CardContent>
-      </Card>
 
-      {/* 6. Loading States */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Loading Placeholders</CardTitle>
-        </CardHeader>
-        <CardContent style={{ gap: 8 }}>
-          <Spinner size="md" />
-          <Skeleton variant="text" width="80%" />
-          <Skeleton variant="rectangular" height={50} />
-        </CardContent>
-      </Card>
+          <OfflineState />
 
-      {/* 7. Dialogs & Toast */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Interactive Modals & Toasts</CardTitle>
-        </CardHeader>
-        <CardContent style={{ gap: 10 }}>
-          <Button variant="primary" onPress={() => setDialogOpen(true)}>Open Customer Modal</Button>
-          <Button variant="danger" onPress={() => setConfirmOpen(true)}>Open Cancellation Dialog</Button>
-          <View style={styles.rowWrap}>
-            <Button size="sm" variant="outline" onPress={() => toast.success('Booking Confirmed', 'Technician assigned.')}>Success</Button>
-            <Button size="sm" variant="outline" onPress={() => toast.error('Payment Error', 'Transaction declined.')}>Error</Button>
-          </View>
-        </CardContent>
-      </Card>
+          {/* User Auth Context */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Authenticated Session Context</CardTitle>
+              <CardDescription>Live user context from /api/v1/auth/me via NabsClient</CardDescription>
+            </CardHeader>
+            <CardContent style={{ gap: 6 }}>
+              <Text style={{ fontSize: 12, color: colors.mutedForeground }}>ID: {user?.id}</Text>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: colors.cardForeground }}>Email: {user?.email}</Text>
+              <View style={styles.rowWrap}>
+                <Badge variant="primary" dot>Role: {role || 'CUSTOMER'}</Badge>
+                <Badge variant="success" dot>Status: {user?.status || 'ACTIVE'}</Badge>
+              </View>
+            </CardContent>
+          </Card>
 
-      {/* 8. States */}
-      <EmptyState
-        title="No Active Service Bookings"
-        description="Schedule a new service request anytime."
-        actionLabel="Request Service"
-        onAction={() => toast.info('Booking', 'New booking wizard would launch.')}
-      />
+          {/* Theme Tokens */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Semantic Color Tokens</CardTitle>
+              <CardDescription>Shared tokens across Customer App UI components.</CardDescription>
+            </CardHeader>
+            <CardContent style={styles.tokenGrid}>
+              {Object.entries(colors).slice(0, 10).map(([token, hex]) => (
+                <View key={token} style={[styles.tokenCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                  <View style={[styles.colorBox, { backgroundColor: hex as string }]} />
+                  <Text style={[styles.tokenName, { color: colors.cardForeground }]}>{token}</Text>
+                </View>
+              ))}
+            </CardContent>
+          </Card>
 
-      <ErrorState
-        title="Unable to Load Bookings"
-        description="Could not synchronize with customer backend portal."
-        onRetry={() => toast.info('Retrying Sync', 'Connecting to backend...')}
-      />
+          {/* Buttons */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Buttons & Actions</CardTitle>
+            </CardHeader>
+            <CardContent style={{ gap: 10 }}>
+              <Button variant="primary" leftIcon="file-text">Book Service Request</Button>
+              <Button variant="danger" onPress={logout}>Sign Out</Button>
+            </CardContent>
+          </Card>
 
-      {/* Modals */}
-      <Dialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        title="Customer App Modal"
-        description="Accessible native dialog shell."
-        footer={
-          <Button variant="primary" onPress={() => setDialogOpen(false)}>
-            Dismiss
-          </Button>
-        }
-      >
-        <Text style={{ color: colors.cardForeground, fontSize: 13 }}>
-          Modular dialog foundation enforcing accessible layout standards.
-        </Text>
-      </Dialog>
+          {/* Modals */}
+          <Dialog
+            open={dialogOpen}
+            onClose={() => setDialogOpen(false)}
+            title="Customer App Modal"
+            description="Accessible native dialog shell."
+            footer={
+              <Button variant="primary" onPress={() => setDialogOpen(false)}>
+                Dismiss
+              </Button>
+            }
+          >
+            <Text style={{ color: colors.cardForeground, fontSize: 13 }}>
+              Modular dialog foundation enforcing accessible layout standards.
+            </Text>
+          </Dialog>
 
-      <ConfirmDialog
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        onConfirm={() => {
-          setConfirmOpen(false);
-          toast.success('Cancelled', 'Service booking was cancelled.');
-        }}
-        title="Confirm Cancellation"
-        description="Are you sure you wish to cancel this scheduled service request?"
-      />
-    </MobileLayout>
+          <ConfirmDialog
+            open={confirmOpen}
+            onClose={() => setConfirmOpen(false)}
+            onConfirm={() => {
+              setConfirmOpen(false);
+              toast.success('Cancelled', 'Service booking was cancelled.');
+            }}
+            title="Confirm Cancellation"
+            description="Are you sure you wish to cancel this scheduled service request?"
+          />
+        </MobileLayout>
+      </RoleGuard>
+    </ProtectedRoute>
   );
 }
 

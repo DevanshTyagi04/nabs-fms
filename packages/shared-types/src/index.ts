@@ -1,5 +1,8 @@
 export type ThemeMode = 'light' | 'dark' | 'system';
 
+export type UserRole = 'ADMIN' | 'VENDOR' | 'CUSTOMER';
+export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'SUSPENDED' | 'PENDING_VERIFICATION';
+
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
@@ -51,3 +54,5 @@ export type DomainStatus =
   | 'COMPLETED'
   | 'CANCELLED'
   | 'DRAFT';
+
+export type AuthStatus = 'initializing' | 'authenticated' | 'unauthenticated' | 'refreshing';

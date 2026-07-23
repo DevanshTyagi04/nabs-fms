@@ -17,6 +17,9 @@
       ],
       "@packages/constants": [
         "../packages/constants/src/index.ts"
+      ],
+      "@nabs/sdk": [
+        "../packages/sdk/src/index.ts"
       ]
     }
   },
