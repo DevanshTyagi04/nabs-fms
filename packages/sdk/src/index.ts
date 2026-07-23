@@ -573,4 +573,27 @@ export class NabsClient {
     deleteFileAdmin: (fileKey: string) =>
       this.request<ApiResponseEnvelope<{ deleted: boolean; fileKey: string }>>('DELETE', `/api/v1/storage/${fileKey}`),
   };
+
+  public readonly search = {
+    serviceRequests: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: ServiceRequestItem[]; total: number }>>('GET', '/api/v1/search/service-requests', undefined, query),
+
+    surveys: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: SurveyEntity[]; total: number }>>('GET', '/api/v1/search/surveys', undefined, query),
+
+    estimates: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: EstimateEntity[]; total: number }>>('GET', '/api/v1/search/estimates', undefined, query),
+
+    workOrders: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: WorkOrderEntity[]; total: number }>>('GET', '/api/v1/search/work-orders', undefined, query),
+
+    invoices: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: InvoiceEntity[]; total: number }>>('GET', '/api/v1/search/invoices', undefined, query),
+
+    payments: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: PaymentEntity[]; total: number }>>('GET', '/api/v1/search/payments', undefined, query),
+
+    notifications: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: NotificationEntity[]; total: number }>>('GET', '/api/v1/search/notifications', undefined, query),
+  };
 }
