@@ -18,6 +18,8 @@ export const VENDOR_NAVIGATION_CONFIG: NavItem[] = [
     roles: ['VENDOR'],
     order: 2,
     requiresAuth: true,
+    disabled: false,
+    badge: 'Active',
   },
   {
     id: 'vendor-surveys',
@@ -36,8 +38,6 @@ export const VENDOR_NAVIGATION_CONFIG: NavItem[] = [
     roles: ['VENDOR'],
     order: 4,
     requiresAuth: true,
-    disabled: false,
-    badge: 'Active',
   },
   {
     id: 'vendor-profile',

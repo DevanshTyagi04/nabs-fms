@@ -6,20 +6,17 @@ import { RoleGuard } from '@/auth/guards/RoleGuard';
 import { useTheme } from '@/hooks/useTheme';
 import { MobileLayout } from '@/components/layout/Layout';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Spinner } from '@/components/ui/Spinner';
-import { useToast } from '@/hooks/useToast';
-import { TaskChecklistEditor } from '@/execution/TaskChecklistEditor';
+import { ExecutionProgressCard } from '@/execution/ExecutionProgressCard';
 import { useWorkOrders } from '@/features/work-orders/hooks/useWorkOrders';
 
-export default function VendorWorkOrdersScreen() {
+export default function CustomerWorkOrdersScreen() {
   const { colors } = useTheme();
   const router = useRouter();
-  const toast = useToast();
   const [activeTab, setActiveTab] = useState('/work-orders');
 
-  const { workOrders, loading, updateStatus, toggleTask } = useWorkOrders();
+  const { workOrders, loading } = useWorkOrders();
 
   const handleTabChange = (href: string) => {
     setActiveTab(href);
@@ -28,15 +25,10 @@ export default function VendorWorkOrdersScreen() {
     }
   };
 
-  const handleStatusChange = async (id: string, status: string, label: string) => {
-    await updateStatus(id, status);
-    toast.success('Status Updated', `Work Order transitioned to ${label}.`);
-  };
-
   return (
     <ProtectedRoute>
-      <RoleGuard roles={['VENDOR']}>
-        <MobileLayout title="Work Order Dispatches" activeTab={activeTab} onTabChange={handleTabChange}>
+      <RoleGuard roles={['CUSTOMER']}>
+        <MobileLayout title="Work Order Status" activeTab={activeTab} onTabChange={handleTabChange}>
           <ScrollView contentContainerStyle={styles.container}>
             {loading ? (
               <View style={{ padding: 40, alignItems: 'center' }}>
@@ -44,7 +36,7 @@ export default function VendorWorkOrdersScreen() {
               </View>
             ) : workOrders.length === 0 ? (
               <Text style={{ textAlign: 'center', color: colors.mutedForeground, marginVertical: 30 }}>
-                No assigned work orders.
+                No active work orders.
               </Text>
             ) : (
               workOrders.map((wo) => (
@@ -52,36 +44,26 @@ export default function VendorWorkOrdersScreen() {
                   <CardHeader style={styles.cardHeader}>
                     <View style={styles.headerTop}>
                       <Text style={[styles.woNumber, { color: colors.primary }]}>{wo.workOrderNumber}</Text>
-                      <Badge variant={wo.status === 'COMPLETED' ? 'success' : wo.status === 'IN_PROGRESS' ? 'warning' : 'neutral'}>
+                      <Badge variant={wo.status === 'COMPLETED' || wo.status === 'VERIFIED' ? 'success' : 'warning'}>
                         {wo.status}
                       </Badge>
                     </View>
                     <CardTitle>{wo.title}</CardTitle>
-                    <Text style={{ fontSize: 11, color: colors.mutedForeground }}>Schedule: {wo.scheduledDate}</Text>
+                    <Text style={{ fontSize: 11, color: colors.mutedForeground }}>Assigned Vendor: {wo.vendorName}</Text>
+                    <Text style={{ fontSize: 11, color: colors.mutedForeground }}>Scheduled: {wo.scheduledDate}</Text>
                   </CardHeader>
 
                   <CardContent style={{ gap: 12 }}>
-                    <TaskChecklistEditor tasks={wo.tasks} onToggleTask={(tId) => toggleTask(wo.id, tId)} />
+                    <ExecutionProgressCard
+                      percentage={wo.percentage}
+                      completedTasks={wo.completedTasks}
+                      totalTasks={wo.totalTasks}
+                    />
 
-                    {/* Execution Controls */}
-                    {wo.status === 'ASSIGNED' || wo.status === 'SCHEDULED' ? (
-                      <Button variant="primary" onPress={() => handleStatusChange(wo.id, 'IN_PROGRESS', 'In Progress')}>
-                        Start Work Order
-                      </Button>
-                    ) : wo.status === 'IN_PROGRESS' ? (
-                      <View style={{ flexDirection: 'row', gap: 8 }}>
-                        <Button variant="secondary" size="sm" onPress={() => handleStatusChange(wo.id, 'ON_HOLD', 'On Hold')} style={{ flex: 1 }}>
-                          Pause Work
-                        </Button>
-                        <Button variant="primary" size="sm" onPress={() => handleStatusChange(wo.id, 'COMPLETED', 'Completed')} style={{ flex: 1 }}>
-                          Complete Work Order
-                        </Button>
-                      </View>
-                    ) : wo.status === 'ON_HOLD' ? (
-                      <Button variant="primary" onPress={() => handleStatusChange(wo.id, 'IN_PROGRESS', 'In Progress')}>
-                        Resume Work Order
-                      </Button>
-                    ) : null}
+                    <View style={[styles.summaryRow, { borderColor: colors.border }]}>
+                      <Text style={{ fontSize: 12, color: colors.mutedForeground }}>Approved Quotation Total</Text>
+                      <Text style={{ fontSize: 13, fontWeight: '800', color: colors.primary }}>${wo.grandTotal.toFixed(2)}</Text>
+                    </View>
                   </CardContent>
                 </Card>
               ))
@@ -108,5 +90,12 @@ const styles = StyleSheet.create({
   woNumber: {
     fontSize: 12,
     fontWeight: '700',
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 8,
+    borderTopWidth: 1,
   },
 });

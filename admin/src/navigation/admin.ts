@@ -72,9 +72,10 @@ export const ADMIN_NAVIGATION_CONFIG: NavItem[] = [
     roles: ['ADMIN'],
     order: 6,
     requiresAuth: true,
-    disabled: true,
-    badge: 'Phase 8',
-    description: 'Work order management reserved for Phase 8',
+    disabled: false,
+    badge: 'Active',
+    breadcrumb: 'Work Order Management & Execution',
+    description: 'Work order execution lifecycle, scheduling, and QA verification',
   },
   {
     id: 'nav-payments',

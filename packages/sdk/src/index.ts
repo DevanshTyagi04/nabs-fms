@@ -114,6 +114,34 @@ export interface EstimateEntity {
   updatedAt: string;
 }
 
+export interface WorkTaskEntity {
+  id: string;
+  title: string;
+  description?: string;
+  isCompleted: boolean;
+  completedAt?: string;
+}
+
+export interface WorkOrderEntity {
+  id: string;
+  workOrderNumber: string;
+  serviceRequestId: string;
+  estimateId: string;
+  surveyId?: string;
+  ticketNumber?: string;
+  vendorId: string;
+  vendorName?: string;
+  customerId: string;
+  customerName?: string;
+  status: 'CREATED' | 'ASSIGNED' | 'SCHEDULED' | 'IN_PROGRESS' | 'ON_HOLD' | 'COMPLETED' | 'VERIFIED' | 'CANCELLED';
+  scheduledStartDate?: string;
+  scheduledEndDate?: string;
+  technicianName?: string;
+  tasks: WorkTaskEntity[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export class NabsClient {
   private baseUrl: string;
   private token?: string;
@@ -345,5 +373,52 @@ export class NabsClient {
 
     rejectCustomer: (id: string, dto?: { reason?: string }) =>
       this.request<ApiResponseEnvelope<EstimateEntity>>('POST', `/api/v1/customer/estimates/${id}/reject`, dto),
+  };
+
+  public readonly workOrders = {
+    createAdmin: (dto: { estimateId: string; scheduledStartDate?: string; scheduledEndDate?: string; technicianName?: string }) =>
+      this.request<ApiResponseEnvelope<WorkOrderEntity>>('POST', '/api/v1/admin/work-orders', dto),
+
+    getAllAdmin: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: WorkOrderEntity[]; total: number }>>('GET', '/api/v1/admin/work-orders', undefined, query),
+
+    getByIdAdmin: (id: string) =>
+      this.request<ApiResponseEnvelope<WorkOrderEntity>>('GET', `/api/v1/admin/work-orders/${id}`),
+
+    verifyAdmin: (id: string, remarks?: string) =>
+      this.request<ApiResponseEnvelope<WorkOrderEntity>>('POST', `/api/v1/admin/work-orders/${id}/verify`, { remarks }),
+
+    cancelAdmin: (id: string, reason?: string) =>
+      this.request<ApiResponseEnvelope<WorkOrderEntity>>('POST', `/api/v1/admin/work-orders/${id}/cancel`, { reason }),
+
+    getVendorWorkOrders: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: WorkOrderEntity[]; total: number }>>('GET', '/api/v1/vendor/work-orders', undefined, query),
+
+    getByIdVendor: (id: string) =>
+      this.request<ApiResponseEnvelope<WorkOrderEntity>>('GET', `/api/v1/vendor/work-orders/${id}`),
+
+    startVendor: (id: string) =>
+      this.request<ApiResponseEnvelope<WorkOrderEntity>>('POST', `/api/v1/vendor/work-orders/${id}/start`),
+
+    pauseVendor: (id: string, dto: { reason: string }) =>
+      this.request<ApiResponseEnvelope<WorkOrderEntity>>('POST', `/api/v1/vendor/work-orders/${id}/pause`, dto),
+
+    resumeVendor: (id: string) =>
+      this.request<ApiResponseEnvelope<WorkOrderEntity>>('POST', `/api/v1/vendor/work-orders/${id}/resume`),
+
+    completeVendor: (id: string) =>
+      this.request<ApiResponseEnvelope<WorkOrderEntity>>('POST', `/api/v1/vendor/work-orders/${id}/complete`),
+
+    addTaskVendor: (id: string, dto: { title: string; description?: string }) =>
+      this.request<ApiResponseEnvelope<WorkTaskEntity>>('POST', `/api/v1/vendor/work-orders/${id}/tasks`, dto),
+
+    updateTaskVendor: (id: string, taskId: string, dto: { isCompleted: boolean }) =>
+      this.request<ApiResponseEnvelope<WorkTaskEntity>>('PATCH', `/api/v1/vendor/work-orders/${id}/tasks/${taskId}`, dto),
+
+    getCustomerWorkOrders: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: WorkOrderEntity[]; total: number }>>('GET', '/api/v1/customer/work-orders', undefined, query),
+
+    getByIdCustomer: (id: string) =>
+      this.request<ApiResponseEnvelope<WorkOrderEntity>>('GET', `/api/v1/customer/work-orders/${id}`),
   };
 }
