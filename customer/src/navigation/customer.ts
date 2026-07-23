@@ -18,8 +18,8 @@ export const CUSTOMER_NAVIGATION_CONFIG: NavItem[] = [
     roles: ['CUSTOMER'],
     order: 2,
     requiresAuth: true,
-    disabled: true,
-    badge: 'Phase 4',
+    disabled: false,
+    badge: 'Active',
   },
   {
     id: 'customer-profile',

@@ -33,9 +33,10 @@ export const ADMIN_NAVIGATION_CONFIG: NavItem[] = [
     roles: ['ADMIN'],
     order: 3,
     requiresAuth: true,
-    disabled: true,
-    badge: 'Phase 5',
-    description: 'Service request management reserved for Phase 5',
+    disabled: false,
+    badge: 'Active',
+    breadcrumb: 'Service Request Management',
+    description: 'Service request lifecycle and assignment',
   },
   {
     id: 'nav-surveys',

@@ -4,7 +4,7 @@ export interface NabsSdkConfig {
   baseUrl: string;
   token?: string;
   fetchApi?: typeof fetch;
-  onUnauthorized?: () => Promise<string | null>; // Callback to request token refresh if 401 occurs
+  onUnauthorized?: () => Promise<string | null>;
 }
 
 export interface ApiResponseEnvelope<T> {
@@ -42,6 +42,29 @@ export interface LoginResponseData {
 
 export interface RefreshTokenResponseData {
   tokens: AuthTokens;
+}
+
+export interface ServiceRequestItem {
+  id: string;
+  ticketNumber: string;
+  title: string;
+  description: string;
+  category: string;
+  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  status: 'CREATED' | 'ASSIGNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  customerId: string;
+  assignedVendorId?: string;
+  serviceAddress?: string;
+  createdAt: string;
+  updatedAt: string;
+  history?: Array<{
+    id: string;
+    fromStatus?: string;
+    toStatus: string;
+    remarks?: string;
+    changedById: string;
+    createdAt: string;
+  }>;
 }
 
 export class NabsClient {
@@ -164,5 +187,46 @@ export class NabsClient {
 
     getMe: () =>
       this.request<ApiResponseEnvelope<{ user: AuthUser }>>('GET', '/api/v1/auth/me'),
+  };
+
+  public readonly serviceRequests = {
+    // Customer
+    create: (dto: { title: string; description: string; category: string; priority?: string; serviceAddress?: string }) =>
+      this.request<ApiResponseEnvelope<ServiceRequestItem>>('POST', '/api/v1/service-requests', dto),
+
+    getMyRequests: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: ServiceRequestItem[]; total: number }>>('GET', '/api/v1/service-requests/my-requests', undefined, query),
+
+    getByIdCustomer: (id: string) =>
+      this.request<ApiResponseEnvelope<ServiceRequestItem>>('GET', `/api/v1/service-requests/${id}`),
+
+    cancelCustomer: (id: string, remarks?: string) =>
+      this.request<ApiResponseEnvelope<ServiceRequestItem>>('POST', `/api/v1/service-requests/${id}/cancel`, { remarks }),
+
+    // Vendor
+    getAssignedVendor: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: ServiceRequestItem[]; total: number }>>('GET', '/api/v1/vendor/service-requests', undefined, query),
+
+    getByIdVendor: (id: string) =>
+      this.request<ApiResponseEnvelope<ServiceRequestItem>>('GET', `/api/v1/vendor/service-requests/${id}`),
+
+    acceptVendor: (id: string) =>
+      this.request<ApiResponseEnvelope<ServiceRequestItem>>('POST', `/api/v1/vendor/service-requests/${id}/accept`),
+
+    rejectVendor: (id: string, reason?: string) =>
+      this.request<ApiResponseEnvelope<ServiceRequestItem>>('POST', `/api/v1/vendor/service-requests/${id}/reject`, { reason }),
+
+    // Admin
+    getAllAdmin: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: ServiceRequestItem[]; total: number }>>('GET', '/api/v1/admin/service-requests', undefined, query),
+
+    getByIdAdmin: (id: string) =>
+      this.request<ApiResponseEnvelope<ServiceRequestItem>>('GET', `/api/v1/admin/service-requests/${id}`),
+
+    assignVendorAdmin: (id: string, dto: { vendorId: string; notes?: string }) =>
+      this.request<ApiResponseEnvelope<ServiceRequestItem>>('POST', `/api/v1/admin/service-requests/${id}/assign`, dto),
+
+    changeStatusAdmin: (id: string, dto: { status: string; remarks?: string }) =>
+      this.request<ApiResponseEnvelope<ServiceRequestItem>>('POST', `/api/v1/admin/service-requests/${id}/status`, dto),
   };
 }
