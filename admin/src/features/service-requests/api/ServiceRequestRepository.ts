@@ -123,9 +123,9 @@ export class ServiceRequestRepository {
       const res = await client.serviceRequests.getAllAdmin(filters);
       if (res.data?.items) {
         return {
-          items: res.data.items.map((item) => ({
+          items: res.data.items.map((item: any) => ({
             ...item,
-            history: item.history ? item.history.map((h) => ({
+            history: item.history ? item.history.map((h: any) => ({
               id: h.id,
               type: 'STATUS_CHANGE',
               actor: 'User',

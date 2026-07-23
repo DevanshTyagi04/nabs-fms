@@ -59,9 +59,10 @@ export const ADMIN_NAVIGATION_CONFIG: NavItem[] = [
     roles: ['ADMIN'],
     order: 5,
     requiresAuth: true,
-    disabled: true,
-    badge: 'Phase 7',
-    description: 'Estimate management reserved for Phase 7',
+    disabled: false,
+    badge: 'Active',
+    breadcrumb: 'Estimate Quotation Management',
+    description: 'Pricing calculation, line items, and approval',
   },
   {
     id: 'nav-work-orders',

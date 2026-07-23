@@ -57,14 +57,6 @@ export interface ServiceRequestItem {
   serviceAddress?: string;
   createdAt: string;
   updatedAt: string;
-  history?: Array<{
-    id: string;
-    fromStatus?: string;
-    toStatus: string;
-    remarks?: string;
-    changedById: string;
-    createdAt: string;
-  }>;
 }
 
 export interface SurveyItemEntity {
@@ -88,6 +80,36 @@ export interface SurveyEntity {
   version: number;
   notes?: string;
   items: SurveyItemEntity[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EstimateItemEntity {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  taxRate?: number;
+  discountAmount?: number;
+  total: number;
+}
+
+export interface EstimateEntity {
+  id: string;
+  serviceRequestId: string;
+  ticketNumber?: string;
+  vendorId: string;
+  vendorName?: string;
+  customerId?: string;
+  customerName?: string;
+  status: 'DRAFT' | 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED' | 'EXPIRED';
+  version: number;
+  subtotal: number;
+  taxTotal: number;
+  discountTotal: number;
+  grandTotal: number;
+  validUntil?: string;
+  items: EstimateItemEntity[];
   createdAt: string;
   updatedAt: string;
 }
@@ -285,5 +307,43 @@ export class NabsClient {
 
     getByIdCustomer: (id: string) =>
       this.request<ApiResponseEnvelope<SurveyEntity>>('GET', `/api/v1/customer/surveys/${id}`),
+  };
+
+  public readonly estimates = {
+    getAllAdmin: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: EstimateEntity[]; total: number }>>('GET', '/api/v1/admin/estimates', undefined, query),
+
+    getByIdAdmin: (id: string) =>
+      this.request<ApiResponseEnvelope<EstimateEntity>>('GET', `/api/v1/admin/estimates/${id}`),
+
+    addCommentAdmin: (id: string, dto: { comment: string }) =>
+      this.request<ApiResponseEnvelope<any>>('POST', `/api/v1/admin/estimates/${id}/comments`, dto),
+
+    createDraftVendor: (dto: { serviceRequestId: string; validUntil?: string }) =>
+      this.request<ApiResponseEnvelope<EstimateEntity>>('POST', '/api/v1/vendor/estimates', dto),
+
+    getVendorEstimates: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: EstimateEntity[]; total: number }>>('GET', '/api/v1/vendor/estimates', undefined, query),
+
+    getByIdVendor: (id: string) =>
+      this.request<ApiResponseEnvelope<EstimateEntity>>('GET', `/api/v1/vendor/estimates/${id}`),
+
+    addItemVendor: (id: string, dto: { description: string; quantity: number; unitPrice: number; taxRate?: number; discountAmount?: number }) =>
+      this.request<ApiResponseEnvelope<EstimateItemEntity>>('POST', `/api/v1/vendor/estimates/${id}/items`, dto),
+
+    submitVendor: (id: string) =>
+      this.request<ApiResponseEnvelope<EstimateEntity>>('POST', `/api/v1/vendor/estimates/${id}/submit`),
+
+    getCustomerEstimates: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: EstimateEntity[]; total: number }>>('GET', '/api/v1/customer/estimates', undefined, query),
+
+    getByIdCustomer: (id: string) =>
+      this.request<ApiResponseEnvelope<EstimateEntity>>('GET', `/api/v1/customer/estimates/${id}`),
+
+    approveCustomer: (id: string) =>
+      this.request<ApiResponseEnvelope<EstimateEntity>>('POST', `/api/v1/customer/estimates/${id}/approve`),
+
+    rejectCustomer: (id: string, dto?: { reason?: string }) =>
+      this.request<ApiResponseEnvelope<EstimateEntity>>('POST', `/api/v1/customer/estimates/${id}/reject`, dto),
   };
 }
