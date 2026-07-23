@@ -201,6 +201,16 @@ export interface NotificationEntity {
   updatedAt: string;
 }
 
+export interface StorageMetadataEntity {
+  key: string;
+  originalName: string;
+  contentType: string;
+  size: number;
+  category: string;
+  publicUrl?: string;
+  createdAt?: string;
+}
+
 export class NabsClient {
   private baseUrl: string;
   private token?: string;
@@ -548,5 +558,19 @@ export class NabsClient {
 
     getAllAdmin: (query?: Record<string, any>) =>
       this.request<ApiResponseEnvelope<{ items: NotificationEntity[]; total: number }>>('GET', '/api/v1/admin/notifications', undefined, query),
+  };
+
+  public readonly storage = {
+    getSignedUrl: (fileKey: string) =>
+      this.request<ApiResponseEnvelope<{ signedUrl: string; fileKey: string }>>('GET', '/api/v1/storage/signed-url', undefined, { fileKey }),
+
+    getMetadata: (fileKey: string) =>
+      this.request<ApiResponseEnvelope<StorageMetadataEntity>>('GET', `/api/v1/storage/metadata/${fileKey}`),
+
+    checkHealth: () =>
+      this.request<ApiResponseEnvelope<{ status: string; provider: string }>>('GET', '/api/v1/storage/health'),
+
+    deleteFileAdmin: (fileKey: string) =>
+      this.request<ApiResponseEnvelope<{ deleted: boolean; fileKey: string }>>('DELETE', `/api/v1/storage/${fileKey}`),
   };
 }
