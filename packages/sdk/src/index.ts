@@ -166,6 +166,27 @@ export interface InvoiceEntity {
   updatedAt: string;
 }
 
+export interface PaymentEntity {
+  id: string;
+  paymentNumber: string;
+  invoiceId: string;
+  workOrderId?: string;
+  serviceRequestId?: string;
+  ticketNumber?: string;
+  vendorId?: string;
+  vendorName?: string;
+  customerId: string;
+  customerName?: string;
+  amount: number;
+  status: 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED' | 'CANCELLED';
+  paymentMethod?: string;
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  paidAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export class NabsClient {
   private baseUrl: string;
   private token?: string;
@@ -470,5 +491,28 @@ export class NabsClient {
 
     downloadPdfCustomer: (id: string) =>
       this.request<ApiResponseEnvelope<{ pdfUrl: string }>>('GET', `/api/v1/customer/invoices/${id}/download`),
+  };
+
+  public readonly payments = {
+    initiateCustomer: (dto: { serviceRequestId: string; amount?: number }) =>
+      this.request<ApiResponseEnvelope<PaymentEntity>>('POST', '/api/v1/customer/payments/initiate', dto),
+
+    verifyCustomer: (dto: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) =>
+      this.request<ApiResponseEnvelope<PaymentEntity>>('POST', '/api/v1/customer/payments/verify', dto),
+
+    getCustomerPayments: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: PaymentEntity[]; total: number }>>('GET', '/api/v1/customer/payments', undefined, query),
+
+    getByIdCustomer: (id: string) =>
+      this.request<ApiResponseEnvelope<PaymentEntity>>('GET', `/api/v1/customer/payments/${id}`),
+
+    getAllAdmin: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: PaymentEntity[]; total: number }>>('GET', '/api/v1/admin/payments', undefined, query),
+
+    getByIdAdmin: (id: string) =>
+      this.request<ApiResponseEnvelope<PaymentEntity>>('GET', `/api/v1/admin/payments/${id}`),
+
+    reconcileAdmin: (id: string, dto: { status: 'SUCCESS' | 'REFUNDED'; notes?: string }) =>
+      this.request<ApiResponseEnvelope<PaymentEntity>>('POST', `/api/v1/admin/payments/${id}/reconcile`, dto),
   };
 }

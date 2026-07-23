@@ -98,9 +98,10 @@ export const ADMIN_NAVIGATION_CONFIG: NavItem[] = [
     roles: ['ADMIN'],
     order: 8,
     requiresAuth: true,
-    disabled: true,
-    badge: 'Phase 10',
-    description: 'Payment processing reserved for Phase 10',
+    disabled: false,
+    badge: 'Active',
+    breadcrumb: 'Payment & Transaction Management',
+    description: 'Payment sessions, gateway checkout, and manual reconciliation',
   },
   {
     id: 'nav-reports',

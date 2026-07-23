@@ -54,6 +54,15 @@ export const CUSTOMER_NAVIGATION_CONFIG: NavItem[] = [
     roles: ['CUSTOMER'],
     order: 6,
     requiresAuth: true,
+  },
+  {
+    id: 'customer-payments',
+    title: 'Payments',
+    href: '/payments',
+    icon: 'briefcase',
+    roles: ['CUSTOMER'],
+    order: 7,
+    requiresAuth: true,
     disabled: false,
     badge: 'Active',
   },
@@ -63,7 +72,7 @@ export const CUSTOMER_NAVIGATION_CONFIG: NavItem[] = [
     href: '/profile',
     icon: 'user',
     roles: ['CUSTOMER'],
-    order: 7,
+    order: 8,
     requiresAuth: true,
   },
   {
@@ -72,7 +81,7 @@ export const CUSTOMER_NAVIGATION_CONFIG: NavItem[] = [
     href: '/settings',
     icon: 'settings',
     roles: ['CUSTOMER'],
-    order: 8,
+    order: 9,
     requiresAuth: true,
   },
 ];
