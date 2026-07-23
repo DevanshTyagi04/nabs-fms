@@ -142,6 +142,30 @@ export interface WorkOrderEntity {
   updatedAt: string;
 }
 
+export interface InvoiceEntity {
+  id: string;
+  invoiceNumber: string;
+  workOrderId: string;
+  estimateId?: string;
+  serviceRequestId?: string;
+  ticketNumber?: string;
+  vendorId?: string;
+  vendorName?: string;
+  customerId: string;
+  customerName?: string;
+  status: 'DRAFT' | 'ISSUED' | 'SENT' | 'VIEWED' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+  subtotal: number;
+  taxTotal: number;
+  discountTotal: number;
+  grandTotal: number;
+  amountDue: number;
+  dueDate: string;
+  pdfUrl?: string;
+  items: EstimateItemEntity[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export class NabsClient {
   private baseUrl: string;
   private token?: string;
@@ -420,5 +444,31 @@ export class NabsClient {
 
     getByIdCustomer: (id: string) =>
       this.request<ApiResponseEnvelope<WorkOrderEntity>>('GET', `/api/v1/customer/work-orders/${id}`),
+  };
+
+  public readonly invoices = {
+    generateAdmin: (dto: { paymentId?: string; workOrderId?: string }) =>
+      this.request<ApiResponseEnvelope<InvoiceEntity>>('POST', '/api/v1/admin/invoices/generate', dto),
+
+    getAllAdmin: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: InvoiceEntity[]; total: number }>>('GET', '/api/v1/admin/invoices', undefined, query),
+
+    getByIdAdmin: (id: string) =>
+      this.request<ApiResponseEnvelope<InvoiceEntity>>('GET', `/api/v1/admin/invoices/${id}`),
+
+    cancelAdmin: (id: string, reason?: string) =>
+      this.request<ApiResponseEnvelope<InvoiceEntity>>('POST', `/api/v1/admin/invoices/${id}/cancel`, { reason }),
+
+    regeneratePdfAdmin: (id: string) =>
+      this.request<ApiResponseEnvelope<{ pdfUrl: string }>>('POST', `/api/v1/admin/invoices/${id}/regenerate-pdf`),
+
+    getCustomerInvoices: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: InvoiceEntity[]; total: number }>>('GET', '/api/v1/customer/invoices', undefined, query),
+
+    getByIdCustomer: (id: string) =>
+      this.request<ApiResponseEnvelope<InvoiceEntity>>('GET', `/api/v1/customer/invoices/${id}`),
+
+    downloadPdfCustomer: (id: string) =>
+      this.request<ApiResponseEnvelope<{ pdfUrl: string }>>('GET', `/api/v1/customer/invoices/${id}/download`),
   };
 }
