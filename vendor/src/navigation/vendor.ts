@@ -72,6 +72,15 @@ export const VENDOR_NAVIGATION_CONFIG: NavItem[] = [
     roles: ['VENDOR'],
     order: 8,
     requiresAuth: true,
+  },
+  {
+    id: 'vendor-activity',
+    title: 'Activity',
+    href: '/activity',
+    icon: 'file-text',
+    roles: ['VENDOR'],
+    order: 9,
+    requiresAuth: true,
     disabled: false,
     badge: 'Active',
   },
@@ -81,7 +90,7 @@ export const VENDOR_NAVIGATION_CONFIG: NavItem[] = [
     href: '/profile',
     icon: 'user',
     roles: ['VENDOR'],
-    order: 9,
+    order: 10,
     requiresAuth: true,
   },
   {
@@ -90,7 +99,7 @@ export const VENDOR_NAVIGATION_CONFIG: NavItem[] = [
     href: '/settings',
     icon: 'settings',
     roles: ['VENDOR'],
-    order: 10,
+    order: 11,
     requiresAuth: true,
   },
 ];

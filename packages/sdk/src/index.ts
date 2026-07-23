@@ -211,6 +211,20 @@ export interface StorageMetadataEntity {
   createdAt?: string;
 }
 
+export interface ActivityEntity {
+  id: string;
+  actorId: string;
+  actorName: string;
+  actorRole: string;
+  action: string;
+  category: string;
+  entityType: string;
+  entityId: string;
+  description: string;
+  changes?: Record<string, any>;
+  createdAt: string;
+}
+
 export class NabsClient {
   private baseUrl: string;
   private token?: string;
@@ -595,5 +609,19 @@ export class NabsClient {
 
     notifications: (query?: Record<string, any>) =>
       this.request<ApiResponseEnvelope<{ items: NotificationEntity[]; total: number }>>('GET', '/api/v1/search/notifications', undefined, query),
+  };
+
+  public readonly activity = {
+    getAdminTimeline: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: ActivityEntity[]; total: number }>>('GET', '/api/v1/admin/activity', undefined, query),
+
+    getEntityHistory: (entity: string, id: string) =>
+      this.request<ApiResponseEnvelope<ActivityEntity[]>>('GET', `/api/v1/admin/activity/entity/${entity}/${id}`),
+
+    getVendorTimeline: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: ActivityEntity[]; total: number }>>('GET', '/api/v1/vendor/activity', undefined, query),
+
+    getCustomerTimeline: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: ActivityEntity[]; total: number }>>('GET', '/api/v1/customer/activity', undefined, query),
   };
 }
