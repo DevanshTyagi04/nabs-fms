@@ -46,9 +46,10 @@ export const ADMIN_NAVIGATION_CONFIG: NavItem[] = [
     roles: ['ADMIN'],
     order: 4,
     requiresAuth: true,
-    disabled: true,
-    badge: 'Phase 6',
-    description: 'Survey management reserved for Phase 6',
+    disabled: false,
+    badge: 'Active',
+    breadcrumb: 'Technical Survey & Inspection',
+    description: 'Survey inspection form review and approval',
   },
   {
     id: 'nav-estimates',

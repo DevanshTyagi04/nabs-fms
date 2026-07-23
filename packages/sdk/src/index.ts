@@ -67,6 +67,31 @@ export interface ServiceRequestItem {
   }>;
 }
 
+export interface SurveyItemEntity {
+  id: string;
+  title: string;
+  fieldType: string;
+  value?: string;
+  rating?: number;
+  notes?: string;
+  photoUrl?: string;
+  isRequired: boolean;
+}
+
+export interface SurveyEntity {
+  id: string;
+  serviceRequestId: string;
+  ticketNumber?: string;
+  vendorId: string;
+  vendorName?: string;
+  status: 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
+  version: number;
+  notes?: string;
+  items: SurveyItemEntity[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export class NabsClient {
   private baseUrl: string;
   private token?: string;
@@ -190,7 +215,6 @@ export class NabsClient {
   };
 
   public readonly serviceRequests = {
-    // Customer
     create: (dto: { title: string; description: string; category: string; priority?: string; serviceAddress?: string }) =>
       this.request<ApiResponseEnvelope<ServiceRequestItem>>('POST', '/api/v1/service-requests', dto),
 
@@ -203,7 +227,6 @@ export class NabsClient {
     cancelCustomer: (id: string, remarks?: string) =>
       this.request<ApiResponseEnvelope<ServiceRequestItem>>('POST', `/api/v1/service-requests/${id}/cancel`, { remarks }),
 
-    // Vendor
     getAssignedVendor: (query?: Record<string, any>) =>
       this.request<ApiResponseEnvelope<{ items: ServiceRequestItem[]; total: number }>>('GET', '/api/v1/vendor/service-requests', undefined, query),
 
@@ -216,7 +239,6 @@ export class NabsClient {
     rejectVendor: (id: string, reason?: string) =>
       this.request<ApiResponseEnvelope<ServiceRequestItem>>('POST', `/api/v1/vendor/service-requests/${id}/reject`, { reason }),
 
-    // Admin
     getAllAdmin: (query?: Record<string, any>) =>
       this.request<ApiResponseEnvelope<{ items: ServiceRequestItem[]; total: number }>>('GET', '/api/v1/admin/service-requests', undefined, query),
 
@@ -228,5 +250,40 @@ export class NabsClient {
 
     changeStatusAdmin: (id: string, dto: { status: string; remarks?: string }) =>
       this.request<ApiResponseEnvelope<ServiceRequestItem>>('POST', `/api/v1/admin/service-requests/${id}/status`, dto),
+  };
+
+  public readonly surveys = {
+    getAllAdmin: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: SurveyEntity[]; total: number }>>('GET', '/api/v1/admin/surveys', undefined, query),
+
+    getByIdAdmin: (id: string) =>
+      this.request<ApiResponseEnvelope<SurveyEntity>>('GET', `/api/v1/admin/surveys/${id}`),
+
+    reviewAdmin: (id: string, dto: { status: 'APPROVED' | 'REJECTED'; remarks?: string }) =>
+      this.request<ApiResponseEnvelope<SurveyEntity>>('POST', `/api/v1/admin/surveys/${id}/review`, dto),
+
+    addCommentAdmin: (id: string, dto: { comment: string }) =>
+      this.request<ApiResponseEnvelope<any>>('POST', `/api/v1/admin/surveys/${id}/comments`, dto),
+
+    createDraftVendor: (dto: { serviceRequestId: string; notes?: string }) =>
+      this.request<ApiResponseEnvelope<SurveyEntity>>('POST', '/api/v1/vendor/surveys', dto),
+
+    getVendorSurveys: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: SurveyEntity[]; total: number }>>('GET', '/api/v1/vendor/surveys', undefined, query),
+
+    getByIdVendor: (id: string) =>
+      this.request<ApiResponseEnvelope<SurveyEntity>>('GET', `/api/v1/vendor/surveys/${id}`),
+
+    addItemVendor: (id: string, dto: { title: string; fieldType: string; isRequired?: boolean; rating?: number; value?: string }) =>
+      this.request<ApiResponseEnvelope<SurveyItemEntity>>('POST', `/api/v1/vendor/surveys/${id}/items`, dto),
+
+    submitVendor: (id: string) =>
+      this.request<ApiResponseEnvelope<SurveyEntity>>('POST', `/api/v1/vendor/surveys/${id}/submit`),
+
+    getCustomerSurveys: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ items: SurveyEntity[]; total: number }>>('GET', '/api/v1/customer/surveys', undefined, query),
+
+    getByIdCustomer: (id: string) =>
+      this.request<ApiResponseEnvelope<SurveyEntity>>('GET', `/api/v1/customer/surveys/${id}`),
   };
 }
