@@ -118,8 +118,8 @@ async function main() {
   const adminEmail = 'admin@nabs.com';
   const adminPhone = '+18005550199';
 
-  // Hardcoded bcrypt hash for default development password "AdminPass123!"
-  const defaultPasswordHash = '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vj.U1F0/4C';
+  // Hardcoded Argon2id hash for default development password "AdminPass123!"
+  const defaultPasswordHash = '$argon2id$v=19$m=65536,t=3,p=4$zE4ipLQdwr4BDwq3v8kHZQ$3gNtK5Q6VVzTOlG8KA8ZwcIsarb7dN0BEquiEn6IRRE';
 
   const adminUser = await prisma.user.upsert({
     where: { email: adminEmail },

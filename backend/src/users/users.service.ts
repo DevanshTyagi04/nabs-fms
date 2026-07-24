@@ -26,6 +26,7 @@ export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
   constructor(
+    @Inject(PrismaService)
     private readonly prisma: PrismaService,
     @Inject(STORAGE_PROVIDER_TOKEN)
     private readonly storageProvider: IStorageProvider,

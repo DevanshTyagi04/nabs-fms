@@ -1,4 +1,4 @@
-import { BadgeVariant, DomainStatus } from '../../shared-types/src';
+import { BadgeVariant, DomainStatus } from '@nabs/shared-types';
 
 export const APP_NAME = 'NABS Field Service Management';
 

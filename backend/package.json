@@ -6,6 +6,8 @@
     "doc": "docs"
   },
   "scripts": {
+    "start": "node dist/main.js",
+    "start:dev": "ts-node src/main.ts",
     "build": "tsc",
     "prisma:generate": "prisma generate",
     "db:seed": "prisma db seed",

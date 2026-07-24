@@ -9,6 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@nabs/constants": "*",
+    "@nabs/design-tokens": "*",
+    "@nabs/sdk": "*",
+    "@nabs/shared-types": "*",
     "clsx": "^2.1.1",
     "lucide-react": "^1.26.0",
     "next": "16.2.11",

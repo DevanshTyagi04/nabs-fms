@@ -1,4 +1,4 @@
-import { UserRole, DomainStatus } from '../../shared-types/src';
+import { UserRole, DomainStatus } from '@nabs/shared-types';
 
 export interface NabsSdkConfig {
   baseUrl: string;
@@ -254,7 +254,8 @@ export class NabsClient {
   constructor(config: NabsSdkConfig) {
     this.baseUrl = config.baseUrl.replace(/\/$/, '');
     this.token = config.token;
-    this.fetchApi = config.fetchApi || (typeof fetch !== 'undefined' ? fetch : (null as any));
+    const rawFetch = config.fetchApi || (typeof fetch !== 'undefined' ? fetch : (null as any));
+    this.fetchApi = typeof rawFetch === 'function' ? rawFetch.bind(globalThis) : rawFetch;
     this.onUnauthorized = config.onUnauthorized;
   }
 
