@@ -40,6 +40,15 @@ export interface LoginResponseData {
   tokens: AuthTokens;
 }
 
+export interface RegisterCustomerDto {
+  email: string;
+  phone: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  companyName?: string;
+}
+
 export interface RefreshTokenResponseData {
   tokens: AuthTokens;
 }
@@ -353,6 +362,9 @@ export class NabsClient {
 
   // Domain SDK Modules matching backend OpenAPI specification
   public readonly auth = {
+    registerCustomer: (dto: RegisterCustomerDto) =>
+      this.request<ApiResponseEnvelope<LoginResponseData>>('POST', '/api/v1/auth/register', dto),
+
     login: (credentials: { email: string; password: string }) =>
       this.request<ApiResponseEnvelope<LoginResponseData>>('POST', '/api/v1/auth/login', credentials),
 
@@ -364,6 +376,14 @@ export class NabsClient {
 
     getMe: () =>
       this.request<ApiResponseEnvelope<{ user: AuthUser }>>('GET', '/api/v1/auth/me'),
+  };
+
+  public readonly users = {
+    getProfile: () =>
+      this.request<ApiResponseEnvelope<any>>('GET', '/api/v1/users/me/profile'),
+
+    updateCustomerProfile: (dto: { firstName?: string; lastName?: string; companyName?: string }) =>
+      this.request<ApiResponseEnvelope<any>>('PATCH', '/api/v1/users/me/customer-profile', dto),
   };
 
   public readonly serviceRequests = {

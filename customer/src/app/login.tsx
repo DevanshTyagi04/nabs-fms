@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/auth/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
@@ -44,7 +44,7 @@ export default function CustomerLoginScreen() {
   return (
     <SafeAreaWrapper>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
           <Card style={styles.card}>
             <CardHeader style={styles.header}>
               <View style={[styles.logoBadge, { backgroundColor: colors.primary }]}>
@@ -82,10 +82,17 @@ export default function CustomerLoginScreen() {
               />
             </CardContent>
 
-            <CardFooter style={{ paddingTop: 10 }}>
+            <CardFooter style={{ flexDirection: 'column', gap: 14, paddingTop: 10 }}>
               <Button variant="primary" loading={loading} onPress={handleLogin} style={{ width: '100%' }}>
                 Sign In
               </Button>
+
+              <View style={styles.footerNav}>
+                <Text style={[styles.footerText, { color: colors.mutedForeground }]}>Don't have an account? </Text>
+                <TouchableOpacity onPress={() => router.push('/register' as any)} disabled={loading}>
+                  <Text style={[styles.linkText, { color: colors.primary }]}>Sign Up</Text>
+                </TouchableOpacity>
+              </View>
             </CardFooter>
           </Card>
         </ScrollView>
@@ -133,5 +140,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     flex: 1,
+  },
+  footerNav: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 14,
+  },
+  linkText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

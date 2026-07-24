@@ -1,4 +1,4 @@
-import { NabsClient, AuthUser } from '@nabs/sdk';
+import { NabsClient, AuthUser, RegisterCustomerDto } from '@nabs/sdk';
 import { apiConfig } from '@/config/api';
 import { TokenManager } from '../storage/TokenManager';
 
@@ -16,6 +16,21 @@ export class SessionManager {
       });
     }
     return this.clientInstance;
+  }
+
+  static async register(dto: RegisterCustomerDto): Promise<{ user: AuthUser; accessToken: string }> {
+    const client = this.getClient();
+    const response = await client.auth.registerCustomer(dto);
+
+    if (!response.data || !response.data.tokens) {
+      throw new Error(response.message || 'Registration failed');
+    }
+
+    const { user, tokens } = response.data;
+    await TokenManager.setTokens(tokens);
+    client.setToken(tokens.accessToken);
+
+    return { user, accessToken: tokens.accessToken };
   }
 
   static async login(credentials: { email: string; password: string }): Promise<{ user: AuthUser; accessToken: string }> {

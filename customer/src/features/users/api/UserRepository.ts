@@ -17,27 +17,48 @@ export class UserRepository {
 
   static async getCustomerProfile(): Promise<CustomerProfileData | null> {
     const client = this.getClient();
-    const res = await client.auth.getMe();
-    const u = res.data?.user || res.user;
+    try {
+      const res = await client.users.getProfile();
+      const u = res.data?.user || res.user;
 
-    if (!u) return null;
+      if (!u) return null;
 
-    return {
-      id: u.customerProfileId || u.id,
-      userId: u.id,
-      email: u.email,
-      phone: u.phone,
-      firstName: u.firstName || 'Jane',
-      lastName: u.lastName || 'Doe',
-      companyName: 'Acme Enterprises',
-    };
+      const cp = u.customerProfile || {};
+      return {
+        id: cp.id || u.id,
+        userId: u.id,
+        email: u.email,
+        phone: u.phone,
+        firstName: cp.firstName || u.firstName || '',
+        lastName: cp.lastName || u.lastName || '',
+        companyName: cp.companyName || '',
+      };
+    } catch {
+      // Fallback to auth getMe if full profile fetch fails
+      const res = await client.auth.getMe();
+      const u = res.data?.user || res.user;
+      if (!u) return null;
+
+      return {
+        id: u.customerProfileId || u.id,
+        userId: u.id,
+        email: u.email,
+        phone: u.phone,
+        firstName: u.firstName || '',
+        lastName: u.lastName || '',
+        companyName: '',
+      };
+    }
   }
 
   static async updateCustomerProfile(dto: Partial<CustomerProfileData>): Promise<CustomerProfileData> {
-    const current = await this.getCustomerProfile();
-    return {
-      ...current!,
-      ...dto,
-    };
+    const client = this.getClient();
+    await client.users.updateCustomerProfile({
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      companyName: dto.companyName,
+    });
+    const updated = await this.getCustomerProfile();
+    return updated!;
   }
 }

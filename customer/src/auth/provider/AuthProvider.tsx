@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { AuthStatus, UserRole } from '@packages/shared-types';
-import { AuthUser } from '@nabs/sdk';
+import { AuthUser, RegisterCustomerDto } from '@nabs/sdk';
 import { SessionManager } from '../services/SessionManager';
 
 interface AuthContextType {
@@ -8,6 +8,7 @@ interface AuthContextType {
   user: AuthUser | null;
   role: UserRole | null;
   permissions: string[];
+  register: (dto: RegisterCustomerDto) => Promise<void>;
   login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
   restoreSession: () => Promise<void>;
@@ -50,6 +51,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     restoreSession();
   }, [restoreSession]);
 
+  const register = async (dto: RegisterCustomerDto) => {
+    setError(null);
+    try {
+      const { user: authUser } = await SessionManager.register(dto);
+      setUser(authUser);
+      setStatus('authenticated');
+    } catch (err: any) {
+      setError(err.message || 'Registration failed');
+      setStatus('unauthenticated');
+      throw err;
+    }
+  };
+
   const login = async (credentials: { email: string; password: string }) => {
     setError(null);
     try {
@@ -82,6 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         role,
         permissions,
+        register,
         login,
         logout,
         restoreSession,

@@ -44,8 +44,6 @@ export default function CustomerHomeScreen() {
             badgeLabel="Phase 3 Mobile"
           />
 
-          <OfflineState />
-
           {/* 2. Metrics Grid */}
           <View style={styles.metricsContainer}>
             {CUSTOMER_PLACEHOLDER_METRICS.map((metric) => (

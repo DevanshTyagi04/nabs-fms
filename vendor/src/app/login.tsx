@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/auth/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { PasswordInput } from '@/components/ui/PasswordInput';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
+import { Dialog } from '@/components/ui/Dialog';
 import { Icon } from '@/components/ui/Icon';
 import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/useToast';
@@ -16,6 +17,7 @@ export default function VendorLoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
 
   const { login } = useAuth();
   const router = useRouter();
@@ -44,7 +46,7 @@ export default function VendorLoginScreen() {
   return (
     <SafeAreaWrapper>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
           <Card style={styles.card}>
             <CardHeader style={styles.header}>
               <View style={[styles.logoBadge, { backgroundColor: colors.primary }]}>
@@ -82,14 +84,45 @@ export default function VendorLoginScreen() {
               />
             </CardContent>
 
-            <CardFooter style={{ paddingTop: 10 }}>
+            <CardFooter style={{ flexDirection: 'column', gap: 14, paddingTop: 10 }}>
               <Button variant="primary" loading={loading} onPress={handleLogin} style={{ width: '100%' }}>
                 Sign In
               </Button>
+
+              <View style={styles.footerNav}>
+                <Text style={[styles.footerText, { color: colors.mutedForeground }]}>Need a Vendor Account? </Text>
+                <TouchableOpacity onPress={() => setInfoModalOpen(true)} disabled={loading}>
+                  <Text style={[styles.linkText, { color: colors.primary }]}>Request Access</Text>
+                </TouchableOpacity>
+              </View>
             </CardFooter>
           </Card>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <Dialog
+        open={infoModalOpen}
+        onClose={() => setInfoModalOpen(false)}
+        title="Vendor Partner Onboarding"
+        description="How to get onboarded as a verified service partner"
+        footer={
+          <Button variant="primary" size="sm" onPress={() => setInfoModalOpen(false)}>
+            Got It
+          </Button>
+        }
+      >
+        <View style={{ gap: 12 }}>
+          <Text style={{ fontSize: 13, color: colors.cardForeground, lineHeight: 18 }}>
+            NABS Vendor accounts are provisioned and verified by Platform Administrators to ensure service quality, GST compliance, and background verification.
+          </Text>
+          <View style={[styles.infoBox, { backgroundColor: colors.muted + '20', borderColor: colors.border }]}>
+            <Icon name="info" size="sm" color="info" />
+            <Text style={{ fontSize: 12, color: colors.mutedForeground, flex: 1 }}>
+              To register your business as a service provider, please contact dispatch operations at admin@nabs.com or submit your verification documents to your regional manager.
+            </Text>
+          </View>
+        </View>
+      </Dialog>
     </SafeAreaWrapper>
   );
 }
@@ -133,5 +166,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     flex: 1,
+  },
+  footerNav: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 14,
+  },
+  linkText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  infoBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 6,
+    borderWidth: 1,
+    gap: 8,
   },
 });
