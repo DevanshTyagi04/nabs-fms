@@ -99,6 +99,15 @@ export const CUSTOMER_NAVIGATION_CONFIG: NavItem[] = [
     roles: ['CUSTOMER'],
     order: 11,
     requiresAuth: true,
+  },
+  {
+    id: 'customer-sync',
+    title: 'Sync',
+    href: '/sync',
+    icon: 'settings',
+    roles: ['CUSTOMER'],
+    order: 12,
+    requiresAuth: true,
     disabled: false,
     badge: 'Active',
   },
@@ -108,7 +117,7 @@ export const CUSTOMER_NAVIGATION_CONFIG: NavItem[] = [
     href: '/profile',
     icon: 'user',
     roles: ['CUSTOMER'],
-    order: 12,
+    order: 13,
     requiresAuth: true,
   },
   {
@@ -117,7 +126,7 @@ export const CUSTOMER_NAVIGATION_CONFIG: NavItem[] = [
     href: '/settings',
     icon: 'settings',
     roles: ['CUSTOMER'],
-    order: 13,
+    order: 14,
     requiresAuth: true,
   },
 ];

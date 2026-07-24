@@ -90,6 +90,15 @@ export const VENDOR_NAVIGATION_CONFIG: NavItem[] = [
     roles: ['VENDOR'],
     order: 10,
     requiresAuth: true,
+  },
+  {
+    id: 'vendor-sync',
+    title: 'Sync',
+    href: '/sync',
+    icon: 'settings',
+    roles: ['VENDOR'],
+    order: 11,
+    requiresAuth: true,
     disabled: false,
     badge: 'Active',
   },
@@ -99,7 +108,7 @@ export const VENDOR_NAVIGATION_CONFIG: NavItem[] = [
     href: '/profile',
     icon: 'user',
     roles: ['VENDOR'],
-    order: 11,
+    order: 12,
     requiresAuth: true,
   },
   {
@@ -108,7 +117,7 @@ export const VENDOR_NAVIGATION_CONFIG: NavItem[] = [
     href: '/settings',
     icon: 'settings',
     roles: ['VENDOR'],
-    order: 12,
+    order: 13,
     requiresAuth: true,
   },
 ];

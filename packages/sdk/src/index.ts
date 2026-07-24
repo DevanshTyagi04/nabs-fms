@@ -234,6 +234,15 @@ export interface DashboardMetricsEntity {
   workOrderCompletionRate: number;
 }
 
+export interface QueueMetricsEntity {
+  name: string;
+  active: number;
+  waiting: number;
+  completed: number;
+  failed: number;
+  delayed: number;
+}
+
 export class NabsClient {
   private baseUrl: string;
   private token?: string;
@@ -655,5 +664,10 @@ export class NabsClient {
 
     getCustomerDashboard: (query?: Record<string, any>) =>
       this.request<ApiResponseEnvelope<{ totalRequests: number; spent: number }>>('GET', '/api/v1/customer/reports/dashboard', undefined, query),
+  };
+
+  public readonly jobs = {
+    getQueueStats: () =>
+      this.request<ApiResponseEnvelope<QueueMetricsEntity[]>>('GET', '/api/v1/admin/jobs/stats'),
   };
 }
