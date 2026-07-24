@@ -225,6 +225,15 @@ export interface ActivityEntity {
   createdAt: string;
 }
 
+export interface DashboardMetricsEntity {
+  totalRevenue: number;
+  activeWorkOrders: number;
+  completedServices: number;
+  paymentSettlementRate: number;
+  revenueGrowthPercent: number;
+  workOrderCompletionRate: number;
+}
+
 export class NabsClient {
   private baseUrl: string;
   private token?: string;
@@ -623,5 +632,28 @@ export class NabsClient {
 
     getCustomerTimeline: (query?: Record<string, any>) =>
       this.request<ApiResponseEnvelope<{ items: ActivityEntity[]; total: number }>>('GET', '/api/v1/customer/activity', undefined, query),
+  };
+
+  public readonly reports = {
+    getAdminDashboard: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<DashboardMetricsEntity>>('GET', '/api/v1/admin/reports/dashboard', undefined, query),
+
+    getRevenueReports: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ totalRevenue: number; breakdown: any[] }>>('GET', '/api/v1/admin/reports/revenue', undefined, query),
+
+    getServiceReports: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ totalServices: number; breakdown: any[] }>>('GET', '/api/v1/admin/reports/services', undefined, query),
+
+    getPaymentReports: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ totalPayments: number; breakdown: any[] }>>('GET', '/api/v1/admin/reports/payments', undefined, query),
+
+    getWorkOrderReports: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ totalWorkOrders: number; breakdown: any[] }>>('GET', '/api/v1/admin/reports/work-orders', undefined, query),
+
+    getVendorDashboard: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ totalJobs: number; earned: number }>>('GET', '/api/v1/vendor/reports/dashboard', undefined, query),
+
+    getCustomerDashboard: (query?: Record<string, any>) =>
+      this.request<ApiResponseEnvelope<{ totalRequests: number; spent: number }>>('GET', '/api/v1/customer/reports/dashboard', undefined, query),
   };
 }

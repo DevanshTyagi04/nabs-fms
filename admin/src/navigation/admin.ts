@@ -150,9 +150,10 @@ export const ADMIN_NAVIGATION_CONFIG: NavItem[] = [
     roles: ['ADMIN'],
     order: 12,
     requiresAuth: true,
-    disabled: true,
-    badge: 'Phase 15',
-    description: 'Analytics and reporting reserved for Phase 15',
+    disabled: false,
+    badge: 'Active',
+    breadcrumb: 'Executive Analytics & Financial Reports',
+    description: 'Platform KPIs, revenue analytics, work order performance, and export tools',
   },
   {
     id: 'nav-settings',
