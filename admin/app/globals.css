@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@layer utilities {
+  .secure-texture {
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.02) 10px, rgba(0,0,0,0.02) 20px);
+  }
+}
+
+:root {
+  --background: #f8f9ff;
+  --foreground: #0b1c30;
+  --card: #ffffff;
+  --card-foreground: #0b1c30;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #006591;
+  --secondary-foreground: #ffffff;
+  --muted: #f8f9ff;
+  --muted-foreground: #45464d;
+  --border: #c6c6cd;
+  --input: #c6c6cd;
+  --ring: #006591;
+  --radius: 0.5rem;
+}
+
+/* Fallback colors for code.html exact class match */
+.bg-surface-studio {
+  background-color: #F8FAFC;
+}
+.bg-surface-container-lowest {
+  background-color: #ffffff;
+}
+.border-outline-variant {
+  border-color: #c6c6cd;
+}
+.text-on-surface {
+  color: #0b1c30;
+}
+.text-on-surface-variant {
+  color: #45464d;
+}
+.text-outline {
+  color: #76777d;
+}
+.bg-surface {
+  background-color: #f8f9ff;
+}
+.text-secondary {
+  color: #006591;
+}
+.bg-primary {
+  background-color: #000000;
+}
+.text-on-primary {
+  color: #ffffff;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Inter', sans-serif;
+  }
+}
