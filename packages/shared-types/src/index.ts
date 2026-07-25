@@ -40,7 +40,20 @@ export type IconName =
   | 'eye-off'
   | 'moon'
   | 'sun'
-  | 'wifi-off';
+  | 'wifi-off'
+  | 'trending-up'
+  | 'trending-down'
+  | 'dollar-sign'
+  | 'download'
+  | 'bar-chart'
+  | 'arrow-right'
+  | 'plus-circle'
+  | 'user-check'
+  | 'activity'
+  | 'copy'
+  | 'filter'
+  | 'clock'
+  | 'star';
 
 export interface BaseComponentProps {
   testID?: string;
