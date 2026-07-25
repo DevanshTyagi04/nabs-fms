@@ -56,6 +56,14 @@ export interface ServiceRequestListItem {
     firstName: string;
     lastName: string;
     companyName?: string | null;
+    user?: {
+      email?: string;
+      phone?: string;
+    } | null;
+  } | null;
+  serviceCategory?: {
+    id: string;
+    name: string;
   } | null;
   assignedVendor?: {
     id: string;
@@ -66,10 +74,13 @@ export interface ServiceRequestListItem {
 export interface ServiceRequestsResponse {
   data: ServiceRequestListItem[];
   meta?: {
-    totalItems: number;
-    itemPerPage: number;
-    totalPages: number;
-    currentPage: number;
+    total?: number;
+    totalItems?: number;
+    itemPerPage?: number;
+    limit?: number;
+    totalPages?: number;
+    currentPage?: number;
+    page?: number;
   };
 }
 
@@ -93,10 +104,13 @@ export interface ActivityListItem {
 export interface ActivityFeedResponse {
   data: ActivityListItem[];
   meta?: {
-    totalItems: number;
-    itemPerPage: number;
-    totalPages: number;
-    currentPage: number;
+    total?: number;
+    totalItems?: number;
+    itemPerPage?: number;
+    limit?: number;
+    totalPages?: number;
+    currentPage?: number;
+    page?: number;
   };
 }
 

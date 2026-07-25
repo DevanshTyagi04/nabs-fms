@@ -169,14 +169,20 @@ export function RecentRequestsTable({ refreshTrigger }: RecentRequestsTableProps
 
                 return (
                   <tr key={r.id} className="hover:bg-[#eff4ff] transition-colors text-[13px]">
-                    <td className="px-5 py-2.5 font-mono text-xs font-bold text-[#006591]">{r.ticketNumber}</td>
+                    <td className="px-5 py-2.5 font-mono text-xs font-bold text-[#006591]">
+                      <a href={`/service-requests/${r.id}`} className="hover:underline">
+                        {r.ticketNumber}
+                      </a>
+                    </td>
                     <td className="px-5 py-2.5 font-medium text-[#0b1c30]">{customerName}</td>
                     <td className="px-5 py-2.5 text-center">{getPriorityBadge(r.priority)}</td>
                     <td className="px-5 py-2.5">{getStatusBadge(r.status)}</td>
                     <td className="px-5 py-2.5 text-[#45464d]">{vendorName}</td>
                     <td className="px-5 py-2.5 text-[#45464d] font-mono text-[11px]">{createdDate}</td>
                     <td className="px-5 py-2.5 text-right">
-                      <button className="text-[#006591] hover:underline font-bold text-[11px]">View</button>
+                      <a href={`/service-requests/${r.id}`} className="text-[#006591] hover:underline font-bold text-[11px]">
+                        View
+                      </a>
                     </td>
                   </tr>
                 );

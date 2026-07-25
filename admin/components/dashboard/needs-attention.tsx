@@ -140,9 +140,12 @@ export function NeedsAttention({ refreshTrigger }: NeedsAttentionProps) {
       </div>
 
       <div className="p-3 border-t border-[#c6c6cd]">
-        <button className="w-full py-2 text-[11px] font-bold text-[#006591] border border-[#006591] rounded-lg hover:bg-[#006591]/5 transition-colors">
+        <a
+          href="/service-requests"
+          className="block w-full text-center py-2 text-[11px] font-bold text-[#006591] border border-[#006591] rounded-lg hover:bg-[#006591]/5 transition-colors"
+        >
           View Worklist
-        </button>
+        </a>
       </div>
     </div>
   );

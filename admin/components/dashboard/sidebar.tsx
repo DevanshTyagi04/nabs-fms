@@ -2,19 +2,29 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { HealthWidget } from './health-widget';
-import { Banknote, ChevronRight, HardHat, LayoutDashboard, Settings, Users, Wallet } from 'lucide-react';
+import { Banknote, ChevronRight, HardHat, LayoutDashboard, Settings, Users } from 'lucide-react';
 
 export function Sidebar() {
+  const pathname = usePathname();
+
+  const isDashboard = pathname === '/dashboard';
+  const isServiceRequests = pathname.startsWith('/service-requests');
+
   return (
     <aside className="fixed left-0 top-14 h-[calc(100vh-56px)] z-40 w-60 bg-white border-r border-[#c6c6cd] flex flex-col hidden lg:flex">
       <div className="flex-1 overflow-y-auto scroll-hide px-3 py-4">
         <nav className="space-y-1">
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold bg-[#0b1c30] text-white transition-all"
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+              isDashboard
+                ? 'bg-[#0b1c30] text-white shadow-sm'
+                : 'text-[#45464d] hover:bg-slate-100 hover:text-[#0b1c30]'
+            }`}
           >
-            <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+            <span className="material-symbols-outlined text-[18px]">
               <LayoutDashboard />
             </span>
             <span>Dashboard</span>
@@ -32,9 +42,16 @@ export function Sidebar() {
               <span className="material-symbols-outlined text-[14px]"><ChevronRight /></span>
             </div>
             <div className="mt-0.5 space-y-0.5">
-              <a href="#" className="block pl-8 py-1 text-[12px] text-[#76777d] hover:text-[#006591] transition-colors border-l border-slate-200 ml-5">
+              <Link
+                href="/service-requests"
+                className={`block pl-8 py-1 text-[12px] transition-colors border-l ml-5 ${
+                  isServiceRequests
+                    ? 'border-[#006591] text-[#006591] font-bold bg-[#eff6ff]/60 rounded-r'
+                    : 'border-slate-200 text-[#76777d] hover:text-[#006591]'
+                }`}
+              >
                 Service Requests
-              </a>
+              </Link>
               <a href="#" className="block pl-8 py-1 text-[12px] text-[#76777d] hover:text-[#006591] transition-colors border-l border-slate-200 ml-5">
                 Technical Surveys
               </a>

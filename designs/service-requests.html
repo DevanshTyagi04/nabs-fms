@@ -1,0 +1,270 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>NABS FSM Admin Portal - Service Requests</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Hanken+Grotesk:wght@600;700;800;900&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#e5eeff",
+                    "tertiary-container": "#00201c",
+                    "surface-bright": "#f8f9ff",
+                    "severity-low": "#10B981",
+                    "inverse-on-surface": "#eaf1ff",
+                    "tertiary-fixed-dim": "#4fdbc8",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#f8f9ff",
+                    "secondary-fixed-dim": "#89ceff",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#cbdbf5",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#131b2e",
+                    "secondary-fixed": "#c9e6ff",
+                    "surface-tint": "#565e74",
+                    "on-tertiary-container": "#009485",
+                    "on-surface": "#0b1c30",
+                    "severity-medium": "#F59E0B",
+                    "on-secondary-fixed": "#001e2f",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed-variant": "#005048",
+                    "severity-high": "#EF4444",
+                    "surface-container-high": "#dce9ff",
+                    "on-primary-fixed": "#131b2e",
+                    "primary": "#000000",
+                    "inverse-primary": "#bec6e0",
+                    "tertiary-fixed": "#71f8e4",
+                    "on-error-container": "#93000a",
+                    "secondary": "#006591",
+                    "state-on-hold": "#6366F1",
+                    "background": "#f8f9ff",
+                    "surface-variant": "#d3e4fe",
+                    "on-secondary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-secondary-container": "#004666",
+                    "on-tertiary": "#ffffff",
+                    "inverse-surface": "#213145",
+                    "on-tertiary-fixed": "#00201c",
+                    "secondary-container": "#39b8fd",
+                    "tertiary": "#000000",
+                    "on-primary-container": "#7c839b",
+                    "on-secondary-fixed-variant": "#004c6e",
+                    "outline": "#76777d",
+                    "surface-container-highest": "#d3e4fe",
+                    "severity-critical": "#7F1D1D",
+                    "outline-variant": "#c6c6cd",
+                    "surface-container-low": "#eff4ff",
+                    "state-pending": "#94A3B8",
+                    "primary-fixed-dim": "#bec6e0",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "on-background": "#0b1c30",
+                    "surface-studio": "#F8FAFC",
+                    "on-surface-variant": "#45464d",
+                    "primary-fixed": "#dae2fd"
+            },
+            "borderRadius": {
+                    "DEFAULT": "12px",
+                    "lg": "12px",
+                    "xl": "16px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "margin-mobile": "16px",
+                    "unit": "8px",
+                    "margin-desktop": "32px",
+                    "base": "4px",
+                    "container-max": "1440px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Hanken Grotesk"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "display-id": ["JetBrains Mono"],
+                    "caption-code": ["JetBrains Mono"],
+                    "headline-lg": ["Hanken Grotesk"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* High Density Table Styling */
+        .table-row:hover { background-color: rgba(229, 238, 255, 0.4); }
+        .sticky-header { position: sticky; top: 0; z-index: 10; }
+    </style>
+</head>
+<body class="bg-surface-studio text-on-surface min-h-screen flex">
+<!-- Side Navigation Bar -->
+<aside class="flex flex-col h-screen fixed left-0 top-0 py-gutter bg-surface-container-low border-r border-outline-variant w-64 z-[60]"><div class="px-6 mb-8"><h1 class="font-headline-sm text-headline-sm font-black text-on-surface">Field Protocol</h1><p class="font-label-md text-label-md text-on-surface-variant opacity-70 uppercase tracking-widest">Enterprise Console</p></div><nav class="flex-1 px-3 space-y-6 overflow-y-auto custom-scrollbar"><div><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined">home</span> Dashboard</a></div><div><p class="px-3 mb-2 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Service Operations</p><div class="space-y-1"><a class="flex items-center gap-3 px-3 py-2 bg-secondary-fixed text-on-secondary-fixed rounded-lg font-semibold font-label-md text-label-md" href="#"><span class="material-symbols-outlined">assignment</span> Service Requests</a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined">content_paste_search</span> Technical Surveys</a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined">request_quote</span> Estimates</a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined">task</span> Work Orders</a></div></div><div><p class="px-3 mb-2 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">People</p><div class="space-y-1"><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined">groups</span> Customers</a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined">handshake</span> Vendors</a></div></div><div><p class="px-3 mb-2 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Finance</p><div class="space-y-1"><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined">payments</span> Payments</a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined">receipt</span> Invoices</a></div></div><div><p class="px-3 mb-2 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Reports</p><div class="space-y-1"><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined">analytics</span> Analytics</a></div></div><div><p class="px-3 mb-2 text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">System</p><div class="space-y-1"><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined">history</span> Activity Logs</a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg font-label-md text-label-md" href="#"><span class="material-symbols-outlined">settings</span> Settings</a></div></div></nav><div class="px-4 py-4 border-t border-outline-variant mt-auto"><p class="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest mb-3">Platform Health</p><div class="space-y-2"><div class="flex items-center justify-between text-[11px]"><span class="text-on-surface-variant">Backend</span><span class="text-severity-low font-bold">ONLINE</span></div><div class="flex items-center justify-between text-[11px]"><span class="text-on-surface-variant">PostgreSQL</span><span class="text-severity-low font-bold">99.9%</span></div><div class="flex items-center justify-between text-[11px]"><span class="text-on-surface-variant">Redis Queue</span><span class="text-severity-low font-bold">ACTIVE</span></div></div></div></aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 min-h-screen flex flex-col">
+<!-- Top App Bar -->
+<header class="flex justify-between items-center w-full px-margin-desktop h-16 z-50 bg-surface-studio border-b border-outline-variant sticky top-0">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">admin_panel_settings</span>
+<span class="text-headline-sm font-headline-sm font-bold text-primary">Field Service Admin</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container border-none rounded-full w-64 text-label-md focus:ring-2 focus:ring-secondary text-on-surface" placeholder="Global Search..." type="text">
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined">refresh</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a corporate administrator, looking directly at the camera with a neutral, confident expression. The lighting is bright and clean, typical of a professional studio environment. The background is a soft, blurred office space in light blue and grey tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVf6jdPeSJtzeegyoj5Nnsrr8nMjGj2fcq08QXnPJMMnmZ-PKLPk4LF92aqz0vzB-p7elJfEinBgrH3hsBSoyFLJ1T0hH29c98jQas_MrJk-pDCosBTHuS2L8MGj6ZAAfRe3EmwGqEvIAZp4GtEoE6klU__NhMM-nhNdoa2jUmHIMEp83eJo3RI1PQNutjtenfsXDo0gUJhhsauyiVSenKE3B_UbsSBILMPD3CgGHwUhNU0sQDrwFpQ7Twp4D8LJjsKmWotO-KqAQ">
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-margin-desktop space-y-6 flex-1">
+<!-- Page Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div class="space-y-1">
+<nav class="flex items-center gap-2 text-caption-code font-caption-code text-on-surface-variant uppercase tracking-wider mb-2">
+<span class="">Operations</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">Service Requests</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-primary tracking-tight">Service Requests</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage and monitor all incoming service dispatches across technical categories.</p>
+</div>
+<div class="flex items-center gap-2"><button class="flex items-center gap-2 px-4 py-2.5 border border-outline text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container-low transition-colors active:scale-95"><span class="material-symbols-outlined">refresh</span> Refresh</button><button class="flex items-center gap-2 px-4 py-2.5 border border-outline text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container-low transition-colors active:scale-95"><span class="material-symbols-outlined">view_column</span> Columns</button><div class="relative group"><button class="flex items-center gap-2 px-4 py-2.5 border border-outline text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container-low transition-colors active:scale-95">Export <span class="material-symbols-outlined">expand_more</span></button><div class="absolute right-0 mt-1 w-32 bg-white border border-outline-variant rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50"><a class="block px-4 py-2 text-label-md hover:bg-surface-container-low" href="#">CSV</a><a class="block px-4 py-2 text-label-md hover:bg-surface-container-low" href="#">Excel</a><a class="block px-4 py-2 text-label-md hover:bg-surface-container-low" href="#">PDF</a></div></div></div>
+</div>
+<!-- Filter Toolbar -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex flex-wrap items-center gap-3 shadow-sm"><div class="relative min-w-[280px] w-80"><span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span><input class="w-full pl-10 pr-4 py-2 border-outline-variant border rounded-lg text-body-md focus:ring-2 focus:ring-secondary transition-shadow" placeholder="Search Ticket, Customer, Vendor..." type="text"></div><div class="flex items-center gap-2"><select class="pl-3 pr-8 py-2 border-outline-variant border rounded-lg text-label-md bg-white text-on-surface focus:ring-secondary"><option>All Status</option><option>Created</option><option>Assigned</option><option>Surveyed</option><option>Completed</option></select><select class="pl-3 pr-8 py-2 border-outline-variant border rounded-lg text-label-md bg-white text-on-surface focus:ring-secondary"><option>Priority</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select><div class="flex items-center gap-2 bg-white border border-outline-variant rounded-lg px-3 py-2 cursor-pointer hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[18px] text-on-surface-variant">calendar_today</span><span class="text-label-md text-on-surface">Oct 24 - Oct 31</span></div><select class="pl-3 pr-8 py-2 border-outline-variant border rounded-lg text-label-md bg-white text-on-surface focus:ring-secondary"><option>All Categories</option><option>Electrical</option><option>Plumbing</option><option>HVAC</option><option>Fire Safety</option></select><button class="text-secondary font-label-md text-label-md hover:underline px-2">Reset Filters</button></div></div>
+<!-- Bulk Action Bar (Animated Visibility) -->
+<div class="bg-primary text-on-primary py-3 px-6 rounded-lg flex items-center justify-between shadow-lg transform transition-all duration-300 scale-95 opacity-0 pointer-events-none mb-[-64px] relative z-20" id="bulk-bar"><div class="flex items-center gap-4"><span class="font-label-md text-label-md font-bold"><span id="selected-count" class="">0</span> rows selected</span><div class="h-4 w-[1px] bg-white/20"></div><div class="flex items-center gap-4"><button class="flex items-center gap-1 hover:text-secondary-fixed transition-colors text-label-md"><span class="material-symbols-outlined text-[18px]">person_add</span> Assign Vendor</button><button class="flex items-center gap-1 hover:text-secondary-fixed transition-colors text-label-md"><span class="material-symbols-outlined text-[18px]">published_with_changes</span> Change Status</button><button class="flex items-center gap-1 hover:text-secondary-fixed transition-colors text-label-md"><span class="material-symbols-outlined text-[18px]">ios_share</span> Export</button><button class="flex items-center gap-1 hover:text-secondary-fixed transition-colors text-label-md" onclick="toggleBulkActions(false)"><span class="material-symbols-outlined text-[18px]">close</span> Clear Selection</button></div></div><button class="p-1 hover:bg-white/10 rounded-full transition-colors" onclick="toggleBulkActions(false)"><span class="material-symbols-outlined text-[20px]">close</span></button></div>
+<!-- Main Data Table Section -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col">
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left border-collapse min-w-[1100px]">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant sticky-header">
+<th class="px-4 py-3 w-10">
+<input class="w-4 h-4 rounded border-outline-variant text-secondary focus:ring-secondary" onclick="toggleAllCheckboxes(this)" type="checkbox">
+</th>
+<th class="px-4 py-3 font-label-md text-label-md text-on-surface-variant">
+<div class="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors">
+                                        Ticket ID <span class="material-symbols-outlined text-[16px]">expand_more</span>
+</div>
+</th>
+<th class="px-4 py-3 font-label-md text-label-md text-on-surface-variant">Customer</th>
+<th class="px-4 py-3 font-label-md text-label-md text-on-surface-variant">Category</th>
+<th class="px-4 py-3 font-label-md text-label-md text-on-surface-variant">Priority</th>
+<th class="px-4 py-3 font-label-md text-label-md text-on-surface-variant">Status</th>
+<th class="px-4 py-3 font-label-md text-label-md text-on-surface-variant">Vendor</th>
+<th class="px-4 py-3 font-label-md text-label-md text-on-surface-variant">Created</th>
+<th class="px-4 py-3 font-label-md text-label-md text-on-surface-variant">Last Update</th>
+<th class="px-4 py-3 w-12 text-center"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant"><tr class="table-row group transition-colors hover:bg-surface-container-low cursor-pointer"><td class="px-4 py-3"><input class="row-checkbox w-4 h-4 rounded border-outline-variant text-secondary focus:ring-secondary" onchange="updateSelectedCount()" type="checkbox"></td><td class="px-4 py-3 font-display-id text-display-id text-primary whitespace-nowrap"><a class="hover:underline" href="#">SR-2024-001</a></td><td class="px-4 py-3"><div class="flex flex-col"><a class="font-label-md text-label-md text-on-surface hover:text-secondary hover:underline" href="#">Nexus Corporate Park</a><span class="text-caption-code font-caption-code text-on-surface-variant">Tower A, 4th Floor</span></div></td><td class="px-4 py-3"><span class="rounded-full bg-surface-container text-on-primary-container text-[11px] font-bold uppercase tracking-wider px-3 py-1">HVAC</span></td><td class="px-4 py-3"><span class="flex items-center gap-1.5 text-severity-high font-bold text-[11px] uppercase tracking-tighter"><span class="w-1.5 h-1.5 rounded-full bg-severity-high"></span> Critical</span></td><td class="px-4 py-3"><span class="py-1 rounded bg-secondary-container/10 text-secondary font-label-md text-[11px] border border-secondary-container/20 px-3">ASSIGNED</span></td><td class="px-4 py-3"><div class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-[10px] font-bold text-on-surface-variant">TC</div><a class="text-body-md text-on-surface hover:text-secondary hover:underline" href="#">ThermalCool Inc.</a></div></td><td class="px-4 py-3 text-caption-code font-caption-code text-on-surface-variant">2024-10-24 09:15</td><td class="px-4 py-3 text-caption-code font-caption-code text-on-surface-variant">12 mins ago</td><td class="px-4 py-3 text-center"><button class="p-1.5 hover:bg-surface-container rounded-lg text-on-surface-variant group-hover:text-primary transition-all"><span class="material-symbols-outlined text-[18px]">more_vert</span></button></td></tr></tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="border-t border-outline-variant p-4 flex items-center justify-between bg-surface-studio">
+<div class="flex items-center gap-6">
+<span class="text-label-md text-on-surface-variant">Showing 1-25 of 1,284 entries</span>
+<div class="flex items-center gap-2">
+<label class="text-label-md text-on-surface-variant">Rows per page:</label>
+<select class="bg-transparent border-none text-label-md font-bold text-on-surface focus:ring-0 p-0 cursor-pointer">
+<option>25</option>
+<option>50</option>
+<option>100</option>
+</select>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container transition-colors disabled:opacity-40" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="flex items-center">
+<button class="w-8 h-8 rounded-lg bg-primary text-on-primary font-bold text-label-md">1</button>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container text-on-surface-variant font-bold text-label-md">2</button>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container text-on-surface-variant font-bold text-label-md">3</button>
+<span class="px-2 text-on-surface-variant">...</span>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container text-on-surface-variant font-bold text-label-md">52</button>
+</div>
+<button class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Developer Reference: Empty/Loading/Error States Section (Toggleable) -->
+</div>
+<!-- Global Footer -->
+</main>
+<script>
+        function toggleBulkActions(show) {
+            const bar = document.getElementById('bulk-bar');
+            if (show) {
+                bar.classList.remove('scale-95', 'opacity-0', 'pointer-events-none', 'mb-[-64px]');
+                bar.classList.add('scale-100', 'opacity-100', 'mb-4');
+            } else {
+                bar.classList.add('scale-95', 'opacity-0', 'pointer-events-none', 'mb-[-64px]');
+                bar.classList.remove('scale-100', 'opacity-100', 'mb-4');
+                // Uncheck all when closing
+                document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+                document.querySelector('thead input[type="checkbox"]').checked = false;
+            }
+        }
+
+        function updateSelectedCount() {
+            const checked = document.querySelectorAll('.row-checkbox:checked').length;
+            const countDisplay = document.getElementById('selected-count');
+            countDisplay.innerText = checked;
+            
+            if (checked > 0) {
+                toggleBulkActions(true);
+            } else {
+                toggleBulkActions(false);
+            }
+        }
+
+        function toggleAllCheckboxes(master) {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => cb.checked = master.checked);
+            updateSelectedCount();
+        }
+
+        // Simple mock interaction for the search bar
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('shadow-md');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('shadow-md');
+        });
+    </script>
+
+
+</body></html>
