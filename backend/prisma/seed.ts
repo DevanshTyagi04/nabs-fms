@@ -1,7 +1,23 @@
 import 'dotenv/config';
-import { PrismaClient, UserRole, UserStatus } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
+
+import { seedClean } from './seed/clean.seed';
+import { seedCategories } from './seed/categories.seed';
+import { seedAdmins } from './seed/users.seed';
+import { seedCustomers } from './seed/customers.seed';
+import { seedVendors } from './seed/vendors.seed';
+import { seedAddresses } from './seed/addresses.seed';
+import { seedAMCSubscriptions } from './seed/amc.seed';
+import { seedServiceRequests } from './seed/service-requests.seed';
+import { seedSurveys } from './seed/surveys.seed';
+import { seedEstimates } from './seed/estimates.seed';
+import { seedWorkOrders } from './seed/work-orders.seed';
+import { seedPayments } from './seed/payments.seed';
+import { seedInvoices } from './seed/invoices.seed';
+import { seedNotifications } from './seed/notifications.seed';
+import { seedAuditCommentsAttachments } from './seed/audit.seed';
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -13,153 +29,101 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log('🌱 Starting NABS Production Database Seed (Prisma 7)...');
+  const startTime = Date.now();
+  console.log('🌱 Starting Comprehensive NABS Development Database Seed...');
+  console.log('------------------------------------------------------------');
 
-  // ==============================================================================
-  // 1. SERVICE CATEGORIES SEEDING
-  // ==============================================================================
-  console.log('📌 Seeding Master Service Categories...');
-  const categories = [
-    {
-      name: 'Painting',
-      description: 'Interior, exterior, texture, and protective wall painting services.',
-      icon: 'palette',
-      iconUrl: '/assets/icons/painting.png',
-      color: '#FF5733',
-      displayOrder: 1,
-      estimatedDuration: 480, // 8 hours
-      isActive: true,
-    },
-    {
-      name: 'Electrical',
-      description: 'Wiring, switchboard repair, appliance installation, and safety audits.',
-      icon: 'zap',
-      iconUrl: '/assets/icons/electrical.png',
-      color: '#F1C40F',
-      displayOrder: 2,
-      estimatedDuration: 120, // 2 hours
-      isActive: true,
-    },
-    {
-      name: 'Plumbing',
-      description: 'Pipe leakage, fixture installation, drainage clearing, and water heater repair.',
-      icon: 'droplet',
-      iconUrl: '/assets/icons/plumbing.png',
-      color: '#3498DB',
-      displayOrder: 3,
-      estimatedDuration: 180, // 3 hours
-      isActive: true,
-    },
-    {
-      name: 'Civil',
-      description: 'Masonry, flooring, tile replacement, plastering, and structural repairs.',
-      icon: 'hammer',
-      iconUrl: '/assets/icons/civil.png',
-      color: '#7F8C8D',
-      displayOrder: 4,
-      estimatedDuration: 600, // 10 hours
-      isActive: true,
-    },
-    {
-      name: 'Waterproofing',
-      description: 'Roof, bathroom, terrace, and basement leakage diagnosis and sealing.',
-      icon: 'shield',
-      iconUrl: '/assets/icons/waterproofing.png',
-      color: '#1ABC9C',
-      displayOrder: 5,
-      estimatedDuration: 360, // 6 hours
-      isActive: true,
-    },
-    {
-      name: 'Carpentry',
-      description: 'Furniture assembly, door lock repair, cabinet installation, and woodwork.',
-      icon: 'tool',
-      iconUrl: '/assets/icons/carpentry.png',
-      color: '#E67E22',
-      displayOrder: 6,
-      estimatedDuration: 240, // 4 hours
-      isActive: true,
-    },
-    {
-      name: 'Interior',
-      description: 'False ceiling, modular kitchen installation, wallpaper, and decor setup.',
-      icon: 'layout',
-      iconUrl: '/assets/icons/interior.png',
-      color: '#9B59B6',
-      displayOrder: 7,
-      estimatedDuration: 720, // 12 hours
-      isActive: true,
-    },
-    {
-      name: 'Cleaning',
-      description: 'Deep home cleaning, sofa shampooing, water tank cleaning, and sanitization.',
-      icon: 'sparkles',
-      iconUrl: '/assets/icons/cleaning.png',
-      color: '#2ECC71',
-      displayOrder: 8,
-      estimatedDuration: 240, // 4 hours
-      isActive: true,
-    },
-  ];
+  // 1. Wipe database cleanly
+  await seedClean(prisma);
 
-  for (const category of categories) {
-    await prisma.serviceCategory.upsert({
-      where: { name: category.name },
-      update: category,
-      create: category,
-    });
-  }
-  console.log(`✅ ${categories.length} Service Categories seeded/updated.`);
+  // 2. Master Categories
+  const categories = await seedCategories(prisma);
 
-  // ==============================================================================
-  // 2. DEFAULT ADMIN ACCOUNT SEEDING
-  // ==============================================================================
-  console.log('👤 Seeding System Default Admin Account...');
-  const adminEmail = 'admin@nabs.com';
-  const adminPhone = '+18005550199';
+  // 3. Admin Accounts
+  const admins = await seedAdmins(prisma);
 
-  // Hardcoded Argon2id hash for default development password "AdminPass123!"
-  const defaultPasswordHash = '$argon2id$v=19$m=65536,t=3,p=4$zE4ipLQdwr4BDwq3v8kHZQ$3gNtK5Q6VVzTOlG8KA8ZwcIsarb7dN0BEquiEn6IRRE';
+  // 4. Customer Accounts
+  const customers = await seedCustomers(prisma, 75);
 
-  const adminUser = await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: {
-      status: UserStatus.ACTIVE,
-      emailVerifiedAt: new Date(),
-      phoneVerifiedAt: new Date(),
-    },
-    create: {
-      email: adminEmail,
-      phone: adminPhone,
-      passwordHash: defaultPasswordHash,
-      role: UserRole.ADMIN,
-      status: UserStatus.ACTIVE,
-      emailVerifiedAt: new Date(),
-      phoneVerifiedAt: new Date(),
-    },
-  });
+  // 5. Vendor Accounts & Skills
+  const vendors = await seedVendors(prisma, categories, 30);
 
-  await prisma.adminProfile.upsert({
-    where: { userId: adminUser.id },
-    update: {
-      department: 'Platform Operations & Dispatch',
-      permissions: ['SUPER_ADMIN', 'MANAGE_VENDORS', 'MANAGE_REQUESTS', 'FINANCIAL_AUDIT'],
-    },
-    create: {
-      userId: adminUser.id,
-      department: 'Platform Operations & Dispatch',
-      permissions: ['SUPER_ADMIN', 'MANAGE_VENDORS', 'MANAGE_REQUESTS', 'FINANCIAL_AUDIT'],
-    },
-  });
+  // 6. Customer Addresses
+  const addresses = await seedAddresses(prisma, customers, 120);
 
-  console.log(`✅ Default Admin user seeded: ${adminEmail}`);
+  // 7. AMC Subscriptions
+  const amcSubscriptions = await seedAMCSubscriptions(prisma, customers, 25);
 
-  console.log('🎉 NABS Database Seeding Completed Successfully!');
+  // 8. Service Requests
+  const serviceRequests = await seedServiceRequests(
+    prisma,
+    categories,
+    customers,
+    vendors,
+    addresses,
+    amcSubscriptions,
+    admins,
+    300,
+  );
+
+  // 9. Technical Surveys
+  const surveys = await seedSurveys(prisma, serviceRequests, 200);
+
+  // 10. Financial Estimates
+  const estimates = await seedEstimates(prisma, serviceRequests, surveys, 150);
+
+  // 11. Work Orders & Execution Sub-entities
+  const workOrders = await seedWorkOrders(prisma, serviceRequests, estimates, admins, 120);
+
+  // 12. Payments
+  const payments = await seedPayments(prisma, serviceRequests, 100);
+
+  // 13. Invoices
+  const invoices = await seedInvoices(prisma, payments, 100);
+
+  // 14. Notifications
+  await seedNotifications(prisma, admins, customers, vendors, 200);
+
+  // 15. Audit Logs, Comments & Attachments
+  const { auditLogsCount, commentsCount, attachmentsCount } = await seedAuditCommentsAttachments(
+    prisma,
+    admins,
+    customers,
+    vendors,
+    serviceRequests,
+    surveys,
+    estimates,
+    workOrders,
+    payments,
+  );
+
+  const durationMs = Date.now() - startTime;
+  const durationSec = (durationMs / 1000).toFixed(2);
+
+  console.log('------------------------------------------------------------');
+  console.log(`🎉 NABS Comprehensive Database Seeding Completed in ${durationSec}s!`);
+  console.log('📊 RECORD SUMMARY:');
+  console.log(`   - Categories         : ${categories.length}`);
+  console.log(`   - Admins             : ${admins.length}`);
+  console.log(`   - Customers          : ${customers.length}`);
+  console.log(`   - Vendors            : ${vendors.length}`);
+  console.log(`   - Addresses          : ${addresses.length}`);
+  console.log(`   - AMC Subscriptions  : ${amcSubscriptions.length}`);
+  console.log(`   - Service Requests   : ${serviceRequests.length}`);
+  console.log(`   - Technical Surveys  : ${surveys.length}`);
+  console.log(`   - Estimates          : ${estimates.length}`);
+  console.log(`   - Work Orders        : ${workOrders.length}`);
+  console.log(`   - Payments           : ${payments.length}`);
+  console.log(`   - Invoices           : ${invoices.length}`);
+  console.log(`   - Internal Notes     : ${commentsCount}`);
+  console.log(`   - Attachments        : ${attachmentsCount}`);
+  console.log(`   - Audit Logs         : ${auditLogsCount}`);
+  console.log('------------------------------------------------------------');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Seeding failed:', e);
+    console.error('❌ Database Seeding Failed:', e);
     process.exit(1);
   })
   .finally(async () => {

@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { dashboardApi } from '@/lib/dashboard-api';
 import { DashboardSummaryData } from '@/lib/types/dashboard.types';
+import { BadgeCheck, Calculator, ClipboardList, UserSearch } from 'lucide-react';
 
 interface NeedsAttentionProps {
   refreshTrigger?: number;
@@ -85,22 +86,22 @@ export function NeedsAttention({ refreshTrigger }: NeedsAttentionProps) {
 
   const items = [
     {
-      icon: 'person_search',
+      icon: <UserSearch />,
       title: 'Vendor Assignment',
       count: serviceRequests?.open || 0,
     },
     {
-      icon: 'fact_check',
+      icon: <ClipboardList />,
       title: 'Surveys for QA',
       count: surveys?.submitted || 0,
     },
     {
-      icon: 'request_quote',
+      icon: <Calculator />,
       title: 'Pending Estimates',
       count: estimates?.pendingApproval || 0,
     },
     {
-      icon: 'verified',
+      icon: <BadgeCheck />,
       title: 'WO Verification',
       count: workOrders?.active || 0,
     },
