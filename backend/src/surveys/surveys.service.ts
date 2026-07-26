@@ -521,11 +521,15 @@ export class SurveysService {
         OR: [
           { serviceRequest: { ticketNumber: { contains: query.search.trim(), mode: 'insensitive' } } },
           { items: { some: { observation: { contains: query.search.trim(), mode: 'insensitive' } } } },
+          { vendor: { businessName: { contains: query.search.trim(), mode: 'insensitive' } } },
+          { serviceRequest: { customer: { firstName: { contains: query.search.trim(), mode: 'insensitive' } } } },
+          { serviceRequest: { customer: { lastName: { contains: query.search.trim(), mode: 'insensitive' } } } },
+          { serviceRequest: { customer: { companyName: { contains: query.search.trim(), mode: 'insensitive' } } } },
         ],
       }),
     };
 
-    const [total, surveys] = await Promise.all([
+    const [total, rawSurveys] = await Promise.all([
       this.prisma.survey.count({ where }),
       this.prisma.survey.findMany({
         where,
@@ -540,12 +544,62 @@ export class SurveysService {
           notes: true,
           submittedAt: true,
           createdAt: true,
-          serviceRequest: { select: { ticketNumber: true, title: true } },
-          vendor: { select: { id: true, businessName: true } },
+          updatedAt: true,
+          items: {
+            select: {
+              severity: true,
+            },
+          },
+          serviceRequest: {
+            select: {
+              ticketNumber: true,
+              title: true,
+              status: true,
+              serviceCategory: {
+                select: {
+                  name: true,
+                },
+              },
+              customer: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  companyName: true,
+                  user: {
+                    select: {
+                      email: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          vendor: { select: { id: true, businessName: true, companyName: true } },
           _count: { select: { items: true, attachments: true } },
         },
       }),
     ]);
+
+    const surveys = rawSurveys.map((survey) => {
+      let highestSeverity: SurveySeverity = SurveySeverity.LOW;
+      if (survey.items && survey.items.length > 0) {
+        const severities = survey.items.map((i) => i.severity);
+        if (severities.includes(SurveySeverity.CRITICAL)) {
+          highestSeverity = SurveySeverity.CRITICAL;
+        } else if (severities.includes(SurveySeverity.HIGH)) {
+          highestSeverity = SurveySeverity.HIGH;
+        } else if (severities.includes(SurveySeverity.MEDIUM)) {
+          highestSeverity = SurveySeverity.MEDIUM;
+        } else {
+          highestSeverity = SurveySeverity.LOW;
+        }
+      }
+
+      return {
+        ...survey,
+        highestSeverity,
+      };
+    });
 
     return {
       message: 'All surveys retrieved successfully',

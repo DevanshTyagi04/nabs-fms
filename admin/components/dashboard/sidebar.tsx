@@ -11,6 +11,7 @@ export function Sidebar() {
 
   const isDashboard = pathname === '/dashboard';
   const isServiceRequests = pathname.startsWith('/service-requests');
+  const isTechnicalSurveys = pathname.startsWith('/technical-surveys');
 
   return (
     <aside className="fixed left-0 top-14 h-[calc(100vh-56px)] z-40 w-60 bg-white border-r border-[#c6c6cd] flex flex-col hidden lg:flex">
@@ -52,9 +53,16 @@ export function Sidebar() {
               >
                 Service Requests
               </Link>
-              <a href="#" className="block pl-8 py-1 text-[12px] text-[#76777d] hover:text-[#006591] transition-colors border-l border-slate-200 ml-5">
+              <Link
+                href="/technical-surveys"
+                className={`block pl-8 py-1 text-[12px] transition-colors border-l ml-5 ${
+                  isTechnicalSurveys
+                    ? 'border-[#006591] text-[#006591] font-bold bg-[#eff6ff]/60 rounded-r'
+                    : 'border-slate-200 text-[#76777d] hover:text-[#006591]'
+                }`}
+              >
                 Technical Surveys
-              </a>
+              </Link>
               <a href="#" className="block pl-8 py-1 text-[12px] text-[#76777d] hover:text-[#006591] transition-colors border-l border-slate-200 ml-5">
                 Estimates
               </a>
