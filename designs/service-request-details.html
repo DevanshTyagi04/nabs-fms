@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Service Request Details | Field Protocol</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Hanken+Grotesk:wght@600;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#71f8e4",
+                    "on-primary-fixed": "#131b2e",
+                    "surface-bright": "#f8f9ff",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "secondary-container": "#39b8fd",
+                    "tertiary-fixed-dim": "#4fdbc8",
+                    "primary": "#000000",
+                    "surface-container-high": "#dce9ff",
+                    "on-secondary-fixed-variant": "#004c6e",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "on-primary-container": "#7c839b",
+                    "surface-tint": "#565e74",
+                    "primary-fixed": "#dae2fd",
+                    "on-tertiary-fixed-variant": "#005048",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#45464d",
+                    "outline": "#76777d",
+                    "on-secondary-fixed": "#001e2f",
+                    "surface-studio": "#F8FAFC",
+                    "surface-container-highest": "#d3e4fe",
+                    "secondary": "#006591",
+                    "surface-container": "#e5eeff",
+                    "state-on-hold": "#6366F1",
+                    "on-tertiary-fixed": "#00201c",
+                    "tertiary-container": "#00201c",
+                    "inverse-surface": "#213145",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-secondary-container": "#004666",
+                    "tertiary": "#000000",
+                    "primary-container": "#131b2e",
+                    "inverse-primary": "#bec6e0",
+                    "severity-medium": "#F59E0B",
+                    "secondary-fixed": "#c9e6ff",
+                    "surface-variant": "#d3e4fe",
+                    "surface": "#f8f9ff",
+                    "surface-dim": "#cbdbf5",
+                    "background": "#f8f9ff",
+                    "on-background": "#0b1c30",
+                    "primary-fixed-dim": "#bec6e0",
+                    "severity-high": "#EF4444",
+                    "secondary-fixed-dim": "#89ceff",
+                    "on-tertiary-container": "#009485",
+                    "error-container": "#ffdad6",
+                    "state-pending": "#94A3B8",
+                    "severity-low": "#10B981",
+                    "error": "#ba1a1a",
+                    "on-surface": "#0b1c30",
+                    "severity-critical": "#7F1D1D",
+                    "surface-container-low": "#eff4ff",
+                    "outline-variant": "#c6c6cd",
+                    "on-error": "#ffffff",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-max": "1440px",
+                    "unit": "8px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "32px",
+                    "base": "4px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "display-id": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "caption-code": ["JetBrains Mono"],
+                    "headline-sm": ["Hanken Grotesk"],
+                    "label-md": ["Inter"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "display-id": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "caption-code": ["11px", {"lineHeight": "14px", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["30px", {"lineHeight": "38px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #F8FAFC;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #E2E8F0;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md text-on-background">
+<!-- Top Navigation -->
+<header class="fixed top-0 w-full z-50 bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16">
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-low transition-colors rounded-lg">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<h1 class="font-headline-sm text-headline-sm text-primary tracking-tight">Emergency HVAC Repair</h1>
+<span class="font-display-id text-display-id text-on-surface-variant px-2 py-0.5 bg-surface-container rounded">SR-2024-001</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-label-md text-label-md px-2 py-0.5 bg-secondary-fixed text-on-secondary-fixed rounded uppercase tracking-wider">HVAC</span>
+<span class="font-label-md text-label-md px-2 py-0.5 bg-error-container text-on-error-container rounded uppercase tracking-wider">High</span>
+<span class="font-label-md text-label-md px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded uppercase tracking-wider">In Progress</span>
+<span class="text-caption-code font-caption-code text-on-surface-variant ml-2">Created: 24 Oct, 09:15 • Updated: 2h ago</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-gutter">
+<button class="font-label-md text-label-md text-on-surface-variant flex items-center gap-1 hover:bg-surface-container-low px-3 py-2 rounded transition-colors">
+<span class="material-symbols-outlined">ios_share</span> Export
+        </button>
+<button class="font-label-md text-label-md bg-primary text-on-primary px-4 py-2 rounded flex items-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">person_add</span> Assign Vendor
+        </button>
+<button class="font-label-md text-label-md border border-outline-variant px-4 py-2 rounded hover:bg-surface-container-low transition-colors">
+            Change Status
+        </button>
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</header>
+<main class="pt-24 pb-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<!-- Lifecycle Progress Area -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 mb-gutter">
+<div class="flex items-center justify-between relative">
+<div class="absolute top-4 left-0 w-full h-[2px] bg-outline-variant z-0"></div>
+<div class="relative z-10 flex flex-col items-center gap-2 text-center group">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</div>
+<span class="font-label-md text-label-md text-primary">Request</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2 text-center">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</div>
+<span class="font-label-md text-label-md text-primary">Survey</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2 text-center">
+<div class="w-8 h-8 rounded-full border-2 border-primary bg-surface-container-lowest text-primary flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+</div>
+<span class="font-label-md text-label-md text-primary font-bold">Estimate</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2 text-center">
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant bg-surface-container-lowest text-on-surface-variant flex items-center justify-center opacity-50">
+<span class="text-caption-code">04</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">Execution</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2 text-center">
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant bg-surface-container-lowest text-on-surface-variant flex items-center justify-center opacity-50">
+<span class="text-caption-code">05</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">Payment</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2 text-center">
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant bg-surface-container-lowest text-on-surface-variant flex items-center justify-center opacity-50">
+<span class="material-symbols-outlined text-[18px]">flag</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">Completed</span>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-12 gap-gutter items-start">
+<!-- Main Content -->
+<div class="col-span-12 lg:col-span-8 space-y-gutter">
+<!-- Request Summary Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+<h2 class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Request Summary</h2>
+</div>
+<div class="p-6 space-y-6">
+<div class="space-y-2">
+<h3 class="font-headline-md text-headline-md text-primary tracking-tight">Emergency HVAC System Failure - Main Server Room</h3>
+<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant">
+<p class="text-body-lg text-on-surface-variant leading-relaxed">
+                                Complete system breakdown reported in Data Center A. Temperature rising rapidly (currently 24°C). Immediate inspection and cooling restoration required to prevent server thermal shutdown. Access code for technician: <span class="font-display-id font-bold text-primary">4421</span>.
+                            </p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-outline-variant">
+<div class="space-y-1">
+<p class="text-caption-code text-outline uppercase tracking-wider">Service Category</p>
+<p class="font-label-md text-primary">Climate Control &amp; HVAC</p>
+</div>
+<div class="space-y-1">
+<p class="text-caption-code text-outline uppercase tracking-wider">Priority</p>
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-error"></div>
+<p class="font-label-md text-error font-bold">CRITICAL</p>
+</div>
+</div>
+<div class="space-y-1">
+<p class="text-caption-code text-outline uppercase tracking-wider">Current Phase</p>
+<p class="font-label-md text-primary">Estimation</p>
+</div>
+<div class="space-y-1">
+<p class="text-caption-code text-outline uppercase tracking-wider">Service Source</p>
+<p class="font-label-md text-primary">API (Monitoring System)</p>
+</div>
+<div class="space-y-1">
+<p class="text-caption-code text-outline uppercase tracking-wider">Preferred Visit Date</p>
+<p class="font-label-md text-primary">Oct 25, 2024</p>
+</div>
+<div class="space-y-1">
+<p class="text-caption-code text-outline uppercase tracking-wider">Created On</p>
+<p class="font-label-md text-primary">Oct 24, 09:15 AM</p>
+</div>
+<div class="space-y-1">
+<p class="text-caption-code text-outline uppercase tracking-wider">Last Updated</p>
+<p class="font-label-md text-primary">2 hours ago</p>
+</div>
+<div class="space-y-1">
+<p class="text-caption-code text-outline uppercase tracking-wider">SLA Status</p>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-severity-medium text-[16px]">warning</span>
+<p class="font-label-md text-severity-medium">At Risk (2h remaining)</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Work Timeline -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+<h2 class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Work Timeline</h2>
+</div>
+<div class="p-6 space-y-6">
+<div class="flex flex-wrap gap-2 pb-4 border-b border-outline-variant">
+<button class="px-3 py-1.5 rounded-full bg-primary text-on-primary text-caption-code font-label-md">All Activity</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant text-caption-code font-label-md hover:bg-surface-container-highest transition-colors">Status Changes</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant text-caption-code font-label-md hover:bg-surface-container-highest transition-colors">Notes</button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant text-caption-code font-label-md hover:bg-surface-container-highest transition-colors">System Events</button>
+</div>
+<div class="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-outline-variant">
+<div class="relative flex items-start gap-6">
+<div class="flex items-center justify-center w-10 h-10 rounded-full bg-surface-container-highest border border-outline-variant z-10 shrink-0">
+<span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+</div>
+<div class="flex-1 pt-1">
+<div class="flex items-center justify-between mb-1">
+<h4 class="font-label-md text-primary">Survey Approved</h4>
+<span class="text-caption-code text-outline">10:45 AM</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Technical survey for HVAC unit #402 has been reviewed and approved.</p>
+</div>
+</div>
+<div class="relative flex items-start gap-6">
+<div class="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-on-primary z-10 shrink-0">
+<span class="material-symbols-outlined text-[20px]">rocket_launch</span>
+</div>
+<div class="flex-1 pt-1">
+<div class="flex items-center justify-between mb-1">
+<h4 class="font-label-md text-primary">Request Created</h4>
+<span class="text-caption-code text-outline">09:15 AM</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Emergency HVAC repair request initiated via API monitoring system.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Customer & Vendor Information -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Simplified Customer Information -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden flex flex-col">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-low">
+<h2 class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Customer Information</h2>
+</div>
+<div class="p-6 flex-1 space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-primary">Johnathan Doe</h3>
+<span class="px-2 py-0.5 bg-primary-fixed text-on-primary-fixed text-[10px] rounded uppercase font-bold tracking-wider">AMC</span>
+</div>
+<div class="space-y-4 pt-4 border-t border-outline-variant">
+<div>
+<p class="text-[10px] text-outline uppercase tracking-wider font-bold">Company</p>
+<p class="text-body-md text-primary">Global Logistics Corp.</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-[10px] text-outline uppercase tracking-wider font-bold">Phone</p>
+<p class="text-body-md text-primary">+1 555-0192</p>
+</div>
+<div>
+<p class="text-[10px] text-outline uppercase tracking-wider font-bold">Email</p>
+<p class="text-body-md text-primary truncate">j.doe@logistics.com</p>
+</div>
+</div>
+<div>
+<p class="text-[10px] text-outline uppercase tracking-wider font-bold">Service Address</p>
+<p class="text-body-md text-primary">122 Industrial Way, Suite 4B</p>
+</div>
+</div>
+</div>
+<div class="px-6 py-4 border-t border-outline-variant flex items-center gap-2">
+<button class="p-2 hover:bg-surface-container-low rounded text-primary" title="View Profile"><span class="material-symbols-outlined text-[18px]">account_circle</span></button>
+<button class="p-2 hover:bg-surface-container-low rounded text-primary" title="Call"><span class="material-symbols-outlined text-[18px]">call</span></button>
+<button class="p-2 hover:bg-surface-container-low rounded text-primary" title="Email"><span class="material-symbols-outlined text-[18px]">mail</span></button>
+</div>
+</div>
+<!-- Refined Vendor Information -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden flex flex-col">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-low">
+<h2 class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Vendor Information</h2>
+</div>
+<div class="p-6 flex-1 space-y-4">
+<div class="flex items-start justify-between">
+<div>
+<h3 class="font-headline-sm text-primary">CoolAir Solutions Inc.</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="px-2 py-0.5 bg-severity-low text-on-error text-[10px] rounded uppercase font-bold tracking-wider">Verified</span>
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] rounded uppercase font-bold tracking-wider">Available</span>
+<span class="px-1.5 py-0.5 bg-surface-container-high text-primary text-[10px] rounded flex items-center gap-0.5 font-bold">4.8 <span class="material-symbols-outlined text-[10px] text-severity-medium">star</span></span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant">
+<div>
+<p class="text-[10px] text-outline uppercase tracking-wider font-bold">Primary Contact</p>
+<p class="text-body-md text-primary">Sarah Jenkins</p>
+</div>
+<div>
+<p class="text-[10px] text-outline uppercase tracking-wider font-bold">Phone</p>
+<p class="text-body-md text-primary">+1 555-9876</p>
+</div>
+<div class="col-span-2">
+<p class="text-[10px] text-outline uppercase tracking-wider font-bold">Skills</p>
+<div class="flex gap-1 mt-1">
+<span class="px-2 py-0.5 bg-surface-container text-on-surface-variant text-[10px] rounded">HVAC</span>
+<span class="px-2 py-0.5 bg-surface-container text-on-surface-variant text-[10px] rounded">Electrical</span>
+</div>
+</div>
+</div>
+</div>
+<div class="px-6 py-4 border-t border-outline-variant flex items-center gap-2">
+<button class="p-2 hover:bg-surface-container-low rounded text-primary" title="View Vendor"><span class="material-symbols-outlined text-[18px]">store</span></button>
+<button class="p-2 hover:bg-surface-container-low rounded text-primary" title="Reassign"><span class="material-symbols-outlined text-[18px]">person_search</span></button>
+<button class="p-2 hover:bg-surface-container-low rounded text-primary" title="Call"><span class="material-symbols-outlined text-[18px]">call</span></button>
+</div>
+</div>
+</div>
+<!-- Related Modules -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+<h2 class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Related Modules</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter p-6">
+<!-- Technical Survey -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl flex flex-col min-h-[180px]">
+<div class="px-4 py-3 border-b border-outline-variant flex justify-between items-center">
+<h4 class="font-label-md text-primary">Technical Survey</h4>
+<span class="px-2 py-0.5 bg-severity-low text-on-error text-[10px] rounded uppercase font-bold tracking-wider">APPROVED</span>
+</div>
+<div class="p-5 flex-1 space-y-2">
+<div class="flex justify-between text-body-md">
+<span class="text-on-surface-variant">Inspector</span>
+<span class="font-bold text-primary">Mike Rivera</span>
+</div>
+<div class="flex justify-between text-body-md">
+<span class="text-on-surface-variant">Photos Attached</span>
+<span class="text-primary">8</span>
+</div>
+</div>
+<div class="px-4 py-3 border-t border-outline-variant">
+<button class="text-primary font-label-md text-label-md hover:underline">Review Survey</button>
+</div>
+</div>
+<!-- Estimate -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl flex flex-col min-h-[180px]">
+<div class="px-4 py-3 border-b border-outline-variant flex justify-between items-center">
+<h4 class="font-label-md text-primary">Estimate</h4>
+<span class="px-2 py-0.5 bg-severity-medium text-on-error text-[10px] rounded uppercase font-bold tracking-wider">PENDING APPROVAL</span>
+</div>
+<div class="p-5 flex-1 space-y-2">
+<div class="flex justify-between text-body-md">
+<span class="text-on-surface-variant">Total Amount</span>
+<span class="text-primary font-bold">$1,240.00</span>
+</div>
+<div class="flex justify-between text-body-md">
+<span class="text-on-surface-variant">Last Updated</span>
+<span class="text-primary">2h ago</span>
+</div>
+</div>
+<div class="px-4 py-3 border-t border-outline-variant">
+<button class="text-primary font-label-md text-label-md hover:underline">Open Estimate</button>
+</div>
+</div>
+<!-- Work Order -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl flex flex-col min-h-[180px]">
+<div class="px-4 py-3 border-b border-outline-variant flex justify-between items-center">
+<h4 class="font-label-md text-primary">Work Order</h4>
+<span class="px-2 py-0.5 bg-surface-container-highest text-on-surface-variant text-[10px] rounded uppercase font-bold tracking-wider">NOT STARTED</span>
+</div>
+<div class="p-5 flex-1 flex flex-col justify-center text-center">
+<p class="text-caption-code text-on-surface-variant italic">Next Step: Approve the estimate before generating a Work Order.</p>
+</div>
+<div class="px-4 py-3 border-t border-outline-variant">
+<button class="w-full text-outline font-label-md text-label-md cursor-not-allowed" disabled="">Generate Work Order</button>
+</div>
+</div>
+<!-- Payments & Invoice -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl flex flex-col min-h-[180px]">
+<div class="px-4 py-3 border-b border-outline-variant flex justify-between items-center">
+<h4 class="font-label-md text-primary">Payments &amp; Invoice</h4>
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] rounded uppercase font-bold tracking-wider">PENDING</span>
+</div>
+<div class="p-5 flex-1 flex flex-col justify-center text-center">
+<p class="text-caption-code text-on-surface-variant italic">Waiting for work completion before financial processing begins.</p>
+</div>
+<div class="px-4 py-3 border-t border-outline-variant">
+<button class="w-full text-outline font-label-md text-label-md cursor-not-allowed" disabled="">View Financials</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Internal Notes Section -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-low">
+<h2 class="font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Internal Notes</h2>
+</div>
+<div class="p-6 space-y-6">
+<!-- Note Feed -->
+<div class="space-y-4">
+<div class="p-4 bg-surface-container-low rounded-lg border border-outline-variant">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-primary-fixed flex items-center justify-center text-[10px] font-bold">RA</div>
+<span class="font-label-md text-primary">Regional Admin</span>
+</div>
+<span class="text-caption-code text-outline">Oct 24, 11:20 AM</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Customer requested that the technician calls 15 minutes before arrival at Gate 4.</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-lg border border-outline-variant">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center text-[10px] font-bold">JD</div>
+<span class="font-label-md text-primary">Johnathan Doe</span>
+</div>
+<span class="text-caption-code text-outline">Oct 24, 09:50 AM</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Technician requires roof access key. Security notified for temporary badge.</p>
+</div>
+</div>
+<!-- Add Note -->
+<div class="pt-4 border-t border-outline-variant">
+<textarea class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 text-body-md focus:outline-none focus:ring-1 focus:ring-primary h-24 resize-none" placeholder="Add an administrative note..."></textarea>
+<div class="flex justify-end mt-2">
+<button class="bg-primary text-on-primary px-4 py-2 rounded font-label-md text-label-md hover:opacity-90">Post Note</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Sidebar (30%) -->
+<aside class="col-span-12 lg:col-span-4 sticky top-24 space-y-gutter">
+<!-- Current Status -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-label-md text-label-md text-primary">Current Status</h3>
+<span class="font-display-id text-[10px] text-on-surface-variant bg-surface-studio px-2 py-0.5 rounded">LIVE</span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center border-b border-outline-variant pb-2">
+<span class="text-on-surface-variant font-body-md">Primary Phase</span>
+<span class="font-label-md text-label-md text-primary">Estimation</span>
+</div>
+<div class="flex justify-between items-center border-b border-outline-variant pb-2">
+<span class="text-on-surface-variant font-body-md">SLA Deadline</span>
+<span class="font-label-md text-label-md text-error">Today, 18:00</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-body-md">Assigned To</span>
+<span class="font-label-md text-label-md text-primary">Regional Admin</span>
+</div>
+</div>
+</div>
+<!-- Customer Snapshot -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm">
+<h3 class="font-label-md text-label-md text-primary mb-4">Customer Snapshot</h3>
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-bold">JD</div>
+<div>
+<p class="font-label-md text-label-md text-primary">Johnathan Doe</p>
+<p class="text-caption-code text-on-surface-variant">Global Logistics Corp.</p>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="text-caption-code">122 Industrial Way, Suite 4B</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">call</span>
+<span class="text-caption-code">+1 555-0192</span>
+</div>
+</div>
+</div>
+<!-- Vendor Snapshot -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm">
+<h3 class="font-label-md text-label-md text-primary mb-4">Vendor Snapshot</h3>
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-primary font-bold">CS</div>
+<div>
+<p class="font-label-md text-label-md text-primary">CoolAir Solutions Inc.</p>
+<p class="text-caption-code text-on-surface-variant">Lead Eng: Mike Rivera</p>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">workspace_premium</span>
+<span class="text-caption-code">Certified HVAC Platinum</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">star</span>
+<span class="text-caption-code">4.8 Average Rating</span>
+</div>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 shadow-sm">
+<h3 class="font-label-md text-label-md text-primary mb-4">Quick Actions</h3>
+<div class="grid grid-cols-2 gap-4">
+<button class="p-3 border border-outline-variant rounded hover:bg-surface-container-low transition-colors flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-on-surface-variant">mail</span>
+<span class="text-caption-code">Email</span>
+</button>
+<button class="p-3 border border-outline-variant rounded hover:bg-surface-container-low transition-colors flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-on-surface-variant">print</span>
+<span class="text-caption-code">Print SR</span>
+</button>
+<button class="p-3 border border-outline-variant rounded hover:bg-surface-container-low transition-colors flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-on-surface-variant">add_comment</span>
+<span class="text-caption-code">Add Note</span>
+</button>
+<button class="p-3 border border-outline-variant rounded hover:bg-surface-container-low transition-colors flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-on-surface-variant">flag</span>
+<span class="text-caption-code">Escalate</span>
+</button>
+</div>
+<button class="w-full mt-4 bg-primary-container text-on-primary-fixed p-3 rounded font-label-md text-label-md hover:opacity-90 transition-opacity">
+                    View Field Portal
+                </button>
+</div>
+</aside>
+</div>
+</main>
+<nav class="fixed bottom-0 w-full lg:hidden z-50 bg-surface-container border-t border-outline-variant h-16 flex justify-around items-center px-4 shadow-md">
+<button class="flex flex-col items-center text-on-surface-variant">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md text-[10px]">Requests</span>
+</button>
+<button class="flex flex-col items-center text-on-surface-variant">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md text-[10px]">Schedule</span>
+</button>
+<button class="flex flex-col items-center text-on-surface-variant">
+<span class="material-symbols-outlined">inventory</span>
+<span class="font-label-md text-[10px]">Assets</span>
+</button>
+<button class="flex flex-col items-center text-on-surface-variant">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-[10px]">Profile</span>
+</button>
+</nav>
+<script>
+    document.querySelectorAll('button').forEach(button => {
+        button.addEventListener('mousedown', () => button.classList.add('scale-95'));
+        button.addEventListener('mouseup', () => button.classList.remove('scale-95'));
+        button.addEventListener('mouseleave', () => button.classList.remove('scale-95'));
+    });
+</script>
+</body></html>

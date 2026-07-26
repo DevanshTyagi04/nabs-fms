@@ -5,7 +5,15 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma, Priority, RequestSource, RequestStatus } from '@prisma/client';
+import {
+  Prisma,
+  Priority,
+  RequestSource,
+  RequestStatus,
+  UserStatus,
+  VendorAvailabilityStatus,
+  VendorVerificationStatus,
+} from '@prisma/client';
 import { randomBytes } from 'crypto';
 import { PrismaService } from '../prisma';
 import { VendorAssignmentService } from './assignment/vendor-assignment.service';

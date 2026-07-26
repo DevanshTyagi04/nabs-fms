@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   Logger,
@@ -70,49 +71,79 @@ export class RequestStateService {
       );
     }
 
-    // 2. Optimistic Concurrency Control Update
+    // 2. Scalar Data Object for updateMany
     const updateData: Prisma.ServiceRequestUpdateInput = {
       status: targetStatus,
       version: expectedVersion + 1,
       ...(assignedVendorId !== undefined && {
-        assignedVendor: assignedVendorId ? { connect: { id: assignedVendorId } } : { disconnect: true },
+        assignedVendorId: assignedVendorId || null,
       }),
     };
 
-    const updated = await tx.serviceRequest.updateMany({
-      where: {
-        id: requestId,
-        version: expectedVersion,
-      },
-      data: updateData,
-    });
+    const whereClause = {
+      id: requestId,
+      version: expectedVersion,
+    };
 
-    if (updated.count === 0) {
+    console.log('=== BEFORE PRISMA UPDATE MANY ===');
+    console.log('requestId:', requestId);
+    console.log('assignedVendorId:', assignedVendorId);
+    console.log('expectedVersion:', expectedVersion);
+    console.log('currentStatus:', currentStatus);
+    console.log('targetStatus:', targetStatus);
+    console.log('where clause:', JSON.stringify(whereClause, null, 2));
+    console.log('updateData:', JSON.stringify(updateData, null, 2));
+
+    let updatedCount = 0;
+    try {
+      const updated = await tx.serviceRequest.updateMany({
+        where: whereClause,
+        data: updateData,
+      });
+      updatedCount = updated.count;
+      console.log('=== UPDATE MANY SUCCESS, COUNT ===', updatedCount);
+    } catch (dbError: any) {
+      console.error('=== FULL PRISMA EXCEPTION CAPTURED ===');
+      console.error('Error Name:', dbError?.name);
+      console.error('Error Message:', dbError?.message);
+      console.error('Error Code:', dbError?.code);
+      console.error('Error Meta:', dbError?.meta);
+      console.error('Stack Trace:', dbError?.stack);
+      throw dbError; // Rethrow raw error to inspect
+    }
+
+    if (updatedCount === 0) {
       throw new ConflictException(
-        'Concurrent modification detected. This request was updated by another user. Please refresh and try again.',
+        'Concurrent modification detected. This service request was updated by another user. Please refresh and try again.',
       );
     }
 
     // 3. Create mandatory ServiceRequestHistory record inside same transaction
-    const history = await tx.serviceRequestHistory.create({
-      data: {
-        serviceRequestId: requestId,
-        fromStatus: currentStatus,
-        toStatus: targetStatus,
-        changedById: actorUserId,
-        remarks: remarks?.trim() || null,
-      },
-    });
+    try {
+      const history = await tx.serviceRequestHistory.create({
+        data: {
+          serviceRequestId: requestId,
+          fromStatus: currentStatus,
+          toStatus: targetStatus,
+          changedById: actorUserId,
+          remarks: remarks?.trim() || null,
+        },
+      });
 
-    this.logger.log(
-      `Status transition executed: Request [${requestId}] [${currentStatus}] -> [${targetStatus}] (History ID: ${history.id})`,
-    );
-
-    return {
-      requestId,
-      newStatus: targetStatus,
-      newVersion: expectedVersion + 1,
-      historyId: history.id,
-    };
+      return {
+        requestId,
+        newStatus: targetStatus,
+        newVersion: expectedVersion + 1,
+        historyId: history.id,
+      };
+    } catch (historyError: any) {
+      console.error('=== SERVICE REQUEST HISTORY CREATION ERROR ===');
+      console.error('Error Name:', historyError?.name);
+      console.error('Error Message:', historyError?.message);
+      console.error('Error Code:', historyError?.code);
+      console.error('Error Meta:', historyError?.meta);
+      console.error('Stack Trace:', historyError?.stack);
+      throw historyError;
+    }
   }
 }
