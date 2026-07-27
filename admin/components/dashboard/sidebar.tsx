@@ -63,7 +63,7 @@ export function Sidebar() {
               >
                 Technical Surveys
               </Link>
-              <a href="#" className="block pl-8 py-1 text-[12px] text-[#76777d] hover:text-[#006591] transition-colors border-l border-slate-200 ml-5">
+              <a href="/estimates" className="block pl-8 py-1 text-[12px] text-[#76777d] hover:text-[#006591] transition-colors border-l border-slate-200 ml-5">
                 Estimates
               </a>
               <a href="#" className="block pl-8 py-1 text-[12px] text-[#76777d] hover:text-[#006591] transition-colors border-l border-slate-200 ml-5">

@@ -32,6 +32,12 @@ export function StatusBadge({ status, className = '' }: StatusBadgeProps) {
     case 'DRAFT':
       badgeStyle = 'bg-white text-slate-500 border-slate-300';
       break;
+    case 'PENDING_APPROVAL':
+      badgeStyle = 'bg-amber-50 text-amber-700 border-amber-200';
+      break;
+    case 'REVISED':
+      badgeStyle = 'bg-violet-50 text-violet-700 border-violet-200';
+      break;
     case 'SUPERSEDED':
       badgeStyle = 'bg-slate-100 text-slate-400 border-slate-200 line-through';
       break;
