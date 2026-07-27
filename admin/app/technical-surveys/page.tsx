@@ -417,7 +417,7 @@ function TechnicalSurveysContent() {
                       const vendorName = s.vendor?.businessName || s.vendor?.companyName || 'Unassigned';
 
                       const updatedDate = (s.updatedAt || s.createdAt || '').split('T')[0];
-                      const targetDetailUrl = `/service-requests/${s.serviceRequestId}`;
+                      const targetDetailUrl = `/technical-surveys/${s.id}`;
 
                       return (
                         <tr key={s.id} className="hover:bg-[#eff4ff]/60 transition-colors text-xs">

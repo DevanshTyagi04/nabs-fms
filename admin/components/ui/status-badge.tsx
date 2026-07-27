@@ -8,6 +8,7 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, className = '' }: StatusBadgeProps) {
+  if (!status) return null;
   const normalized = status.toUpperCase().replace(/\s+/g, '_');
 
   let badgeStyle = 'bg-slate-100 text-slate-700 border-slate-200';

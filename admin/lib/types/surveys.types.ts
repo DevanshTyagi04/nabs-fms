@@ -61,3 +61,83 @@ export interface SurveysListResponse {
     totalPages?: number;
   };
 }
+
+export interface SurveyComment {
+  id: string;
+  comment: string;
+  createdAt: string;
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+  } | null;
+}
+
+export interface SurveyAttachment {
+  id: string;
+  fileName: string;
+  url: string;
+  mimeType: string;
+  fileSize: number;
+}
+
+export interface SurveyItem {
+  id: string;
+  surveyId: string;
+  area: string;
+  element: string;
+  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+  isMandatory: boolean;
+  photoRequired: boolean;
+  observation: string;
+  recommendedAction?: string | null;
+  observedAt?: string | null;
+  locationMetadata?: string | null;
+  attachments?: SurveyAttachment[];
+}
+
+export interface SurveyDetail {
+  id: string;
+  serviceRequestId: string;
+  vendorId?: string | null;
+  version: number;
+  status: SurveyStatus;
+  notes?: string | null;
+  startedAt?: string | null;
+  submittedAt?: string | null;
+  approvedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  items?: SurveyItem[];
+  attachments?: SurveyAttachment[];
+  comments?: SurveyComment[];
+  serviceRequest?: {
+    id: string;
+    ticketNumber: string;
+    title: string;
+    status: string;
+    serviceCategory?: {
+      id: string;
+      name: string;
+    } | null;
+    customer?: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      companyName?: string | null;
+      user?: {
+        id: string;
+        email: string;
+        phone?: string | null;
+      } | null;
+    } | null;
+  } | null;
+  vendor?: {
+    id: string;
+    businessName: string;
+    companyName?: string | null;
+    averageRating?: string | number | null;
+    verificationStatus?: string | null;
+  } | null;
+}
+

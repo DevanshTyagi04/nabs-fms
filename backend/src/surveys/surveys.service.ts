@@ -632,11 +632,22 @@ export class SurveysService {
         updatedAt: true,
         serviceRequest: {
           select: {
+            id: true,
             ticketNumber: true,
             title: true,
             description: true,
-            customer: { select: { firstName: true, lastName: true, companyName: true } },
-            address: { select: { addressLine1: true, city: true, state: true } },
+            status: true,
+            serviceCategory: { select: { id: true, name: true } },
+            customer: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                companyName: true,
+                user: { select: { id: true, email: true, phone: true } },
+              },
+            },
+            address: { select: { id: true, addressLine1: true, city: true, state: true } },
           },
         },
         vendor: { select: { id: true, businessName: true, companyName: true, averageRating: true } },

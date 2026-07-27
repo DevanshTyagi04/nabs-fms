@@ -1,7 +1,7 @@
 import { apiClient } from './api-client';
 import { ApiResponse } from './types/auth.types';
 import { SurveySummary } from './types/service-requests.types';
-import { SurveyListItem, SurveyQueryParams, SurveysListResponse } from './types/surveys.types';
+import { SurveyListItem, SurveyQueryParams, SurveysListResponse, SurveyDetail } from './types/surveys.types';
 
 export const surveysApi = {
   /**
@@ -45,6 +45,20 @@ export const surveysApi = {
   },
 
   /**
+   * Fetches a single survey by ID
+   */
+  async getSurveyById(surveyId: string): Promise<SurveyDetail> {
+    const response = await apiClient.get<ApiResponse<{ survey: SurveyDetail } | SurveyDetail>>(
+      `/admin/surveys/${surveyId}`
+    );
+    const raw = response.data.data;
+    if (raw && typeof raw === 'object' && 'survey' in raw) {
+      return (raw as { survey: SurveyDetail }).survey;
+    }
+    return raw as SurveyDetail;
+  },
+
+  /**
    * Fetches technical surveys associated with a Service Request ID
    */
   async getSurveysByRequestId(requestId: string): Promise<SurveySummary[]> {
@@ -68,10 +82,20 @@ export const surveysApi = {
   /**
    * Reviews (Approves or Rejects) a technical survey
    */
-  async reviewSurvey(surveyId: string, action: 'APPROVE' | 'REJECT', remarks?: string) {
+  async reviewSurvey(surveyId: string, status: 'APPROVED' | 'REJECTED', remarks?: string) {
     const response = await apiClient.post<ApiResponse<unknown>>(`/admin/surveys/${surveyId}/review`, {
-      action,
+      status,
       remarks,
+    });
+    return response.data;
+  },
+
+  /**
+   * Adds a comment to a survey
+   */
+  async addSurveyComment(surveyId: string, comment: string) {
+    const response = await apiClient.post<ApiResponse<unknown>>(`/admin/surveys/${surveyId}/comments`, {
+      comment,
     });
     return response.data;
   },

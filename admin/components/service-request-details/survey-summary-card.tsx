@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { ClipboardList, ArrowUpRight } from 'lucide-react';
 import { SurveySummary } from '@/lib/types/service-requests.types';
 
@@ -71,14 +72,22 @@ export function SurveySummaryCard({ survey, isLoading = false, onReview }: Surve
       </div>
 
       <div className="px-4 py-2.5 border-t border-[#c6c6cd] bg-white flex justify-between items-center">
-        {survey.status === 'SUBMITTED' && onReview ? (
-          <button onClick={onReview} className="text-xs font-bold text-[#006591] hover:underline">
-            Review Survey
-          </button>
+        {survey.status === 'SUBMITTED' ? (
+          <Link
+            href={`/technical-surveys/${survey.id}`}
+            className="text-xs font-bold text-[#006591] hover:underline flex items-center gap-1"
+          >
+            <span>Review Survey</span>
+            <ArrowUpRight className="w-3.5 h-3.5" />
+          </Link>
         ) : (
-          <span className="text-xs font-bold text-[#006591] flex items-center gap-1">
-            <span>Survey Logged</span>
-          </span>
+          <Link
+            href={`/technical-surveys/${survey.id}`}
+            className="text-xs font-bold text-[#006591] hover:underline flex items-center gap-1"
+          >
+            <span>View Survey Details</span>
+            <ArrowUpRight className="w-3.5 h-3.5" />
+          </Link>
         )}
       </div>
     </div>
